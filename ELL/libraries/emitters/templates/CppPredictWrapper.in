@@ -1,0 +1,72 @@
+u8R"(#include <string.h>
+#include <vector>
+
+class @@MODULE@@_PredictWrapper
+{
+public:
+    @@MODULE@@_PredictWrapper() = default;
+
+    TensorShape GetInputShape() const
+    {    
+        TensorShape inputShape;
+        @@MODULE@@_GetInputShape(0, &inputShape);
+        return inputShape;
+    }
+
+    int32_t GetInputSize() const
+    {
+        return @@MODULE@@_GetInputSize();
+    }
+    
+    TensorShape GetoutputShape() const
+    {
+        TensorShape outputShape;
+        @@MODULE@@_GetOutputShape(0, &outputShape);
+        return outputShape;
+    }
+
+    int32_t GetOutputSize() const
+    {
+        return @@MODULE@@_GetOutputSize();
+    }
+    
+    int8_t @@SOURCE_CALLBACK@@(@@SOURCE_TYPE@@* buffer)
+    {
+        ::memcpy(buffer, _input, @@MODULE@@_GetInputSize() * sizeof(@@SOURCE_TYPE@@));
+        return 1;
+    }
+
+    void @@SINK_CALLBACK@@(@@SINK_TYPE@@* buffer)
+    {
+        ::memcpy(_output, buffer, @@MODULE@@_GetOutputSize() * sizeof(@@SINK_TYPE@@));
+    }
+
+    void Predict(const std::vector<@@SOURCE_TYPE@@>& input, std::vector<@@SINK_TYPE@@>& output)
+    {
+        _input = input.data();
+        _output = output.data();
+        @@FUNCTION@@(this, 0.0, nullptr);
+    }
+
+private:
+    const @@SOURCE_TYPE@@* _input;
+    @@SINK_TYPE@@* _output;
+};
+
+
+extern "C"
+{
+int8_t @@MODULE@@_InputCallback(void* context, @@SOURCE_TYPE@@* input)
+{
+    auto predictor = reinterpret_cast<@@MODULE@@_PredictWrapper*>(context);
+    return predictor->@@SOURCE_CALLBACK@@(input);
+}
+
+void @@MODULE@@_OutputCallback(void* context, @@SINK_TYPE@@* output)
+{
+    auto predictor = reinterpret_cast<@@MODULE@@_PredictWrapper*>(context);
+    predictor->@@SINK_CALLBACK@@(output);
+}
+} // extern "C"
+
+)"

@@ -1,0 +1,18 @@
+////////////////////////////////////////////////////////////////////////////////////////////////////
+//
+//  Project:  Embedded Learning Library (ELL)
+//  File:     FilterTest.h (dsp)
+//  Authors:  Chuck Jacobs
+//
+////////////////////////////////////////////////////////////////////////////////////////////////////
+
+#pragma once
+
+template <typename ValueType>
+void TestIIRFilter();
+
+template <typename ValueType>
+void TestIIRFilterMultiSample();
+
+template <typename ValueType>
+void TestIIRFilterImpulse();
