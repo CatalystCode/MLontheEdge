@@ -78,21 +78,29 @@ def get_video():
         print("There is no camera device")
         return
     
-    print("I am just printing")
     try:
-        print("I am just printing")
-        #captureVideo = True ## This changed based on the model
-        #preroll = 3
-        
+        captureVideo = True ## This changed based on the model
+        preroll = 3
         ##Create the folder for the videos
-        #startTime = datetime.now()
-        #baseDir = SCRIPT_DIR
-        #videoDir = "myvideos"
-        #videoDirPath = "{0}/{1}".format(baseDir,videoDir)
+        startTime = datetime.now()
+        baseDir = SCRIPT_DIR
+        videoDir = "myvideos"
+        videoDirPath = "{0}/{1}".format(baseDir,videoDir)
         
-        #if not os.path.exists(videoDirPath):
-        #    os.makedirs(videoDirPath)
+        if not os.path.exists(videoDirPath):
+            os.makedirs(videoDirPath)
 
+        videoStartTime =     startTime - timedelta(seconds=preroll)
+        h264FileName =       "video-{0}-{1}.h264".format(__________,videoStartTime.strftime("%Y%m%d%H%M%S"))
+        h264FilePath =       "{0}/{1}/{2}".format(baseDir,videoDir,h264FileName)
+        mp4FileName =        h264FileName.replace('.h264','.mp4')
+        mp4FilePath =        "{0}/{1}/{2}".format(baseDir,videoDir,mp4FileName)
+        mp4FilePathTemp =   "{0}.tmp".format(mp4FileName)
+        mp4BlobName =        "{0}/{1}".format(videoDir,mp4FileName)
+        jsonFileName =       "{0}.json".format(mp4FileName)
+        jsonFilePath =       "{0}/{1}/{2}".format(baseDir,videoDir,jsonFileName)
+
+        ##Save the video to a filee next
 
 def main():
     print("Welcome to main")
