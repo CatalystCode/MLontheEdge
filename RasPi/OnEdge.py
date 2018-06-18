@@ -43,10 +43,10 @@ def start_camera():
     
     ## Will need to decided the finl resting place for these variables
     global captureTime 
-    captureTime = 20
+    captureTime = 10
     #This might need to be negative
     global preroll
-    preroll = 3
+    preroll = 7
     ### HUB Manager This
     global captureRate 
     captureRate = 30.0
@@ -60,13 +60,13 @@ def start_camera():
             videoStream = picamera.PiCameraCircularIO(cameraDevice, seconds=captureTime + preroll)
             cameraDevice.start_recording(videoStream, format='h264')
             time.sleep(captureTime)
-            #cameraDevice.stop_preview()
         except Exception as ex:
             print("The Buffer or Camera could not be intialized")
             cameraDevice = None
             videoStream = None
-        finally:
-            cameraDevice.stop_preview()
+        #finally:
+            #cameraDevice.stop_preview()
+
 
 def stop_camera():
     global cameraDevice, videoStream
@@ -87,13 +87,14 @@ def get_video():
     print("In Get video bout to go to start_camera")
     start_camera()
     print("We worked with no issue in start camera")
-
+    
+    captureVideo = False
     if cameraDevice is None:
         print("There is no camera device")
         return
   
-    captureVideo = True ## This changed based on the model
-    preroll = 3
+    #captureVideo = True ## This changed based on the model
+    preroll = 7
     ##Create the folder for the videos
     startTime = datetime.now()
     baseDir = SCRIPT_DIR
@@ -102,6 +103,12 @@ def get_video():
       
     if not os.path.exists(videoDirPath):
         os.makedirs(videoDirPath)
+    
+    ##Determine if capture video will be true or false
+    if(count % 4 == 0):
+        captureVideo = True
+    else:
+        captureVideo = False
 
     videoStartTime =     startTime - timedelta(seconds=preroll)
     h264FileName =       "video-{0}-{1}.h264".format("seun",videoStartTime.strftime("%Y%m%d%H%M%S"))
@@ -113,18 +120,34 @@ def get_video():
     jsonFileName =       "{0}.json".format(mp4FileName)
     jsonFilePath =       "{0}/{1}/{2}".format(baseDir,videoDir,jsonFileName)
 
-    ##Save the video to a file path specified
-    videoStream.copy_to(h264FilePath, seconds=captureTime + preroll)
+    ## If capture video is true
+    if (captureVideo==True):
+        print("It seems that capture video is true")
 
-    #Convert to MP4 format for viewing
-    mp4box = "MP4Box -fps {0} -quiet -add {1} {2}".format(captureRate,h264FilePath,mp4FilePathTemp) 
-    run_shell(mp4box)
-    os.rename(mp4FilePathTemp, mp4FilePath)
+        #while(True):
+        #    predictStart = datetime.now()
+        #    elapsedTime = predictStart - startTime
+        #    if(elapsedTime.seconds > captureTime):
+        #        break
+            
+        ##Save the video to a file path specified
+        videoStream.copy_to(h264FilePath, seconds=captureTime + preroll)
+            
+        #Convert to MP4 format for viewing
+        mp4box = "MP4Box -fps {0} -quiet -add {1} {2}".format(captureRate,h264FilePath,mp4FilePathTemp) 
+        run_shell(mp4box)
+        os.remove(h264FilePath)
+        os.rename(mp4FilePathTemp, mp4FilePath)
 
 
 def main():
     print("Welcome to main") 
-    get_video()
+    global count
+    count = 1;
+    while(count <= 10):
+        get_video()
+        print(count)
+        count = count+1
 
 
 if __name__ == '__main__':
