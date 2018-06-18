@@ -15,13 +15,15 @@ import subprocess
 import sys
 import io
 import time
-import cv2 ## This is only for webcams. Should not be used.
 import picamera
-import ellmanager as manager
 from datetime import datetime, timedelta
-#import model
 
-###### Variables
+######## Missing Pieces ##########
+##import model:  Need the model created pi3 folder
+##import cv2/pil: Used to preprocess the image. Transition from CV2 to Pil
+##import ellmanager as manager: Waiting on cv2/pil
+
+###### Set up variables ###
 cameraDevice = None
 videoStream = None
 
@@ -115,23 +117,14 @@ def get_video():
     videoStream.copy_to(h264FilePath, seconds=captureTime + preroll)
 
     #Convert to MP4 format for viewing
-    mp4box = "MP4Box -fps {0} -quiet -add {1} {2}".format(captureRate,h264FilePath,mp4FilePathTemp)
-    print("Running the MP4BOX")
-    print(h264FilePath)
-    print(mp4FilePathTemp)
-    #run_shell(mp4box)
-
-    #os.rename(mp4FilePathTemp, mp4FilePath)
-    print("Finished get_video")
+    mp4box = "MP4Box -fps {0} -quiet -add {1} {2}".format(captureRate,h264FilePath,mp4FilePathTemp) 
+    run_shell(mp4box)
+    os.rename(mp4FilePathTemp, mp4FilePath)
 
 
 def main():
-    print("Welcome to main")
-    print("I will now be going get video")
-    ###########
+    print("Welcome to main") 
     get_video()
-    ###########
-    print("Back to main")
 
 
 if __name__ == '__main__':
