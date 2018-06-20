@@ -1,7 +1,9 @@
 #!/usr/bin/env python3
 
+## Import Necessary Python Libraries
 import io
 import random
+import subprocess
 import picamera
 import sys
 import termios
@@ -9,7 +11,15 @@ import tty
 import os
 import time
 from PIL import Image
+from datetime import datetime, timedelta
 
+#Define Variables
+
+
+## Get Working Directory
+SCRIPT_DIR = os.path.split(os.path.realpath(__file__))[0]
+
+## Get Character input from keyboard press
 def getch():
     fd = sys.stdin.fileno()
     oldS = termios.tcgetattr(fd)
@@ -19,6 +29,9 @@ def getch():
     finally:
         termios.tcsetattr(fd, termios.TCSADRAIN, oldS)
     return ch
+
+## Function for running specific shell commands
+
 
 camera = picamera.PiCamera()
 stream = picamera.PiCameraCircularIO(camera, seconds=20)
