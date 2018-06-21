@@ -22,6 +22,9 @@ def run_shell(cmd):
     return str(output.rstrip().decode())
 
 def getch():
+    """
+    Used to get a keyboard input from the user
+    """
     fd = sys.stdin.fileno()
     oldS = termios.tcgetattr(fd)
     try:
@@ -32,29 +35,23 @@ def getch():
     return ch
 
 def get_video():
-    ##Define Variables
+    ## Define Variables
     capture_time = 10
     preroll = 7
     capture_rate = 30.0
     get_key = True
     capture_video = False
     
-    #while camera_device is None:
-        #print("We in get_video()")
-        #camera_device = picamera.PiCamera()
-
-    print("Camera definition worked")
+    ## Set the camera properties up
     camera_device.resolution = (1280, 720)
     camera_device.framerate = capture_rate
-    print("Camera Res and FR worked")
     video_stream = picamera.PiCameraCircularIO(camera_device, seconds=30)
-    print("Video stream worked")
     camera_device.start_preview()
     camera_device.start_recording(video_stream, format='h264')
+    
+    ## Actually get the key from the keyboard to be used as an event
     try:
-        while get_key:
-            print("waiting for the key")
-            
+        while get_key: 
             char = getch()
             camera_device.wait_recording(1)
                 
@@ -70,8 +67,9 @@ def get_video():
             else:
                 get_key = True
     finally:
-        print("We are outisde the try")
-            
+           print("In finally")
+
+    ## Create diretory to save the video that we get if we are told to capture video
     start_time = datetime.now()
     base_dir = SCRIPT_DIR
     video_dir = "myvideos"
@@ -82,6 +80,7 @@ def get_video():
 
     video_start_time = start_time - timedelta(seconds=preroll)
 
+    ## We will have two seperate files, one for before and after the event had been triggered
     #Before:
     before_event =         "video-{0}-{1}.h264".format("before",video_start_time.strftime("%Y%m%d%H%M%S"))
     before_event_path =    "{0}/{1}/{2}".format(base_dir,video_dir,before_event)
@@ -113,15 +112,8 @@ def get_video():
              
         camera_device.stop_recording()
 def main():
-    print("Welcome to main") 
     global camera_device
-    #global video_stream
     camera_device = picamera.PiCamera()
-    #camera_device.resolution = (1280, 720)
-    #camera_device.framerate = 30.0
-    #video_stream = picamera.PiCameraCircularIO(camera_device, seconds=30)
-    #camera_device.start_preview()
-    #camera_device.start_recording(video_stream, format='h264')
     
     while True:
         print("Starting Get Video")
