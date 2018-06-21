@@ -12,6 +12,7 @@ import time
 import picamera
 import cv2
 import ellmanager as emanager
+#import model
 from datetime import datetime, timedelta
 
 SCRIPT_DIR = os.path.split(os.path.realpath(__file__))[0]
@@ -36,8 +37,20 @@ def getch():
         termios.tcsetattr(fd, termios.TCSADRAIN, oldS)
     return ch
 
-def model_predict():
-    print("We are going to make a prediction here")
+#def model_predict(image):
+#    with open("categories.txt", "r") as cat_file:
+#        categories = cat_files.read().splitlines()
+#
+#    input_shape = model.get_default_input_shape()
+#    input_data = emanager.prepare_image_for_model(image, input_shape.columns, input_shape.rows)
+#
+#    prediction = model.predict(input_data)
+#    top_5 = emanager.get_top_n(predicition, 5)
+    
+    #Here we would print the word and return it back to the code below for work
+#
+#
+#    print("We are going to make a prediction here")
 
 def get_video():
     ## Define Variables

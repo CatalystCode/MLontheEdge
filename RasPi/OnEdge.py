@@ -17,6 +17,9 @@ import io
 import time
 import picamera
 from datetime import datetime, timedelta
+import BackgroundScheduler
+
+sched = BackgroundSchedular()
 
 ######## Missing Pieces ##########
 ##import model:  Need the model created pi3 folder
