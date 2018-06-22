@@ -37,6 +37,14 @@ def getch():
         termios.tcsetattr(fd, termios.TCSADRAIN, oldS)
     return ch
 
+def save_video(capture_rate,input_path,output_path,rename_path):
+    ## Convert each indivudul .h264 to mp4 
+    mp4_box = "MP4Box -fps {0} -quiet -add {1} {2}".format(capture_rate,input_path,output_path)
+    run_shell(mp4_box)
+    os.remove(input_path)
+    os.rename(output_path,rename_path)
+
+
 #def model_predict(image):
 #    with open("categories.txt", "r") as cat_file:
 #        categories = cat_files.read().splitlines()
@@ -55,14 +63,11 @@ def getch():
 def get_video():
     ## Define Variables
     capture_time = 30
-    preroll = 10
     capture_rate = 30.0
+    preroll = 10
     get_key = True
     capture_video = False
     
-    ## Set the camera properties up
-    camera_device.resolution = (1280, 720)
-    camera_device.framerate = capture_rate
     video_stream = picamera.PiCameraCircularIO(camera_device, seconds=capture_time)
     camera_device.start_preview()
     camera_device.start_recording(video_stream, format='h264')
@@ -108,26 +113,35 @@ def get_video():
     after_mp4_path =      "{0}/{1}/{2}".format(base_dir,video_dir,after_mp4)
     after_path_temp =     "{0}.tmp".format(after_mp4_path)
 
+    #Full combined video path
+    full_path =           "video-{0}-{1}.mp4".format("full",video_start_time.strftime("%Y%m%d%H%M%S"))
+    full_video_path =     "{0}/{1}/{2}".format(base_dir,video_dir,full_path)
+
     if capture_video == True:
-    ##Save the video to a file path specified
+        ##Save the video to a file path specified
         camera_device.split_recording(after_event_path)
         video_stream.copy_to(before_event_path, seconds=preroll)
         camera_device.wait_recording(preroll+5)
                    
         #Convert to MP4 format for viewing
-        mp4box_before = "MP4Box -fps {0} -quiet -add {1} {2}".format(capture_rate,before_event_path,before_path_temp) 
-        mp4box_after  = "MP4Box -fps {0} -quiet -add {1} {2}".format(capture_rate,after_event_path,after_path_temp)
-
-        run_shell(mp4box_before)
-        run_shell(mp4box_after)
-        os.remove(before_event_path)
-        os.remove(after_event_path)
-             
+        save_video(capture_rate,before_event_path,before_path_temp,before_mp4_path)
+        save_video(capture_rate,after_event_path,after_path_temp,after_mp4_path) 
+        
+        #Combine the two mp4 videos into one and save it
+        full_video = "MP4Box -cat {0} -cat {1} -new {2}".format(before_mp4_path, after_mp4_path, full_video_path)
+        run_shell(full_video)
+        
         camera_device.stop_recording()
+
 def main():
+    #Define Variables
     global camera_device
-    camera_device = picamera.PiCamera()
+    capture_rate = 30.0
     
+    ## Set the camera properties up
+    camera_device = picamera.PiCamera()
+    camera_device.resolution = (1280, 720)
+    camera_device.framerate = capture_rate
     while True:
         print("Starting Get Video")
         get_video()
