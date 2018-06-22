@@ -12,7 +12,8 @@ import time
 import picamera
 import cv2
 import ellmanager as emanager
-#import model
+import model
+import numpy as numpy
 from datetime import datetime, timedelta
 
 SCRIPT_DIR = os.path.split(os.path.realpath(__file__))[0]
@@ -45,15 +46,21 @@ def save_video(capture_rate,input_path,output_path,rename_path):
     os.rename(output_path,rename_path)
 
 
-#def model_predict(image):
-#    with open("categories.txt", "r") as cat_file:
-#        categories = cat_files.read().splitlines()
-#
-#    input_shape = model.get_default_input_shape()
-#    input_data = emanager.prepare_image_for_model(image, input_shape.columns, input_shape.rows)
-#
-#    prediction = model.predict(input_data)
-#    top_5 = emanager.get_top_n(predicition, 5)
+def model_predict(image):
+    with open("categories.txt", "r") as cat_file:
+        categories = cat_file.read().splitlines()
+
+    input_shape = model.get_default_input_shape()
+    input_data = emanager.prepare_image_for_model(image, input_shape.columns, input_shape.rows)
+    print("Image worked")
+    prediction = model.predict(input_data)
+    print("Prediction Worked")
+    top_5 = emanager.get_top_n(prediction, 5)
+    print("Top 5 worked")
+    print(top_5)
+    print("Below is the prediction")
+    print(categories[top_5[0][0]])
+    #print(categories[top_5[0]])
     
     #Here we would print the word and return it back to the code below for work
 #
@@ -68,6 +75,9 @@ def get_video():
     get_key = True
     capture_video = False
     
+    camera_res = (256,256)
+    image = numpy.empty((camera_res[1], camera_res[0],3), dtype=numpy.uint8)
+
     video_stream = picamera.PiCameraCircularIO(camera_device, seconds=capture_time)
     camera_device.start_preview()
     camera_device.start_recording(video_stream, format='h264')
@@ -80,8 +90,10 @@ def get_video():
         if difference.seconds > preroll+1:
             capture_video = True
             print("Event Happened")
-            camera_device.capture('CaptureImage.jpg', use_video_port=True)
+            
+            camera_device.capture(image,'bgr',resize=camera_res,use_video_port=True)
             camera_device.wait_recording(2)
+            model_predict(image)
             break
         else:
             capture_video = False
