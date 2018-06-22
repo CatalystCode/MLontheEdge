@@ -25,19 +25,6 @@ def run_shell(cmd):
     output = subprocess.check_output(cmd.split(' '))
     return str(output.rstrip().decode())
 
-def getch():
-    """
-    Used to get a keyboard input from the user
-    """
-    fd = sys.stdin.fileno()
-    oldS = termios.tcgetattr(fd)
-    try:
-        tty.setraw(sys.stdin.fileno())
-        ch = sys.stdin.read(1)
-    finally:
-        termios.tcsetattr(fd, termios.TCSADRAIN, oldS)
-    return ch
-
 def save_video(capture_rate,input_path,output_path,rename_path):
     ## Convert each indivudul .h264 to mp4 
     mp4_box = "MP4Box -fps {0} -quiet -add {1} {2}".format(capture_rate,input_path,output_path)
@@ -81,20 +68,23 @@ def get_video():
         my_later = datetime.now()
         difference = my_later-my_now
         camera_device.wait_recording(1)
-        
+        print("a")
         if difference.seconds > preroll+1:
             # Take Picture
+            print("b")
             camera_device.capture(image,'bgr',resize=camera_res,use_video_port=True)
             camera_device.wait_recording(2)
             word_predict = model_predict(image)
-            
+            print("c")
             #See what we got back from the model
             if word_predict is not None:
                 print("Event Happened")
                 capture_video=True
                 print(word_predict)
+                difference = 0
                 break
             else:
+                difference = 0
                 capture_video=False
     
     ## Create diretory to save the video that we get if we are told to capture video
