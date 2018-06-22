@@ -59,7 +59,6 @@ def model_predict(image):
         return None
     else:
         word = categories[top_5[0][0]]
-        print(word)
         return word
 
 def get_video():
@@ -82,9 +81,8 @@ def get_video():
         my_later = datetime.now()
         difference = my_later-my_now
         camera_device.wait_recording(1)
-        print("Not greater")
+        
         if difference.seconds > preroll+1:
-            
             # Take Picture
             camera_device.capture(image,'bgr',resize=camera_res,use_video_port=True)
             camera_device.wait_recording(2)
@@ -98,10 +96,6 @@ def get_video():
                 break
             else:
                 capture_video=False
-        
-        else:
-            capture_video = False
-
     
     ## Create diretory to save the video that we get if we are told to capture video
     start_time = datetime.now()
