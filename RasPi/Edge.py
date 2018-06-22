@@ -52,20 +52,15 @@ def model_predict(image):
 
     input_shape = model.get_default_input_shape()
     input_data = emanager.prepare_image_for_model(image, input_shape.columns, input_shape.rows)
-    print("Image worked")
     prediction = model.predict(input_data)
-    print("Prediction Worked")
     top_5 = emanager.get_top_n(prediction, 5)
-    print("Top 5 worked")
-    print(top_5)
-    print("Below is the prediction")
-    print(categories[top_5[0][0]])
-    #print(categories[top_5[0]])
     
-    #Here we would print the word and return it back to the code below for work
-#
-#
-#    print("We are going to make a prediction here")
+    if (len(top_5) < 1):
+        return None
+    else:
+        word = categories[top_5[0][0]]
+        print(word)
+        return word
 
 def get_video():
     ## Define Variables
@@ -87,14 +82,23 @@ def get_video():
         my_later = datetime.now()
         difference = my_later-my_now
         camera_device.wait_recording(1)
+        print("Not greater")
         if difference.seconds > preroll+1:
-            capture_video = True
-            print("Event Happened")
             
+            # Take Picture
             camera_device.capture(image,'bgr',resize=camera_res,use_video_port=True)
             camera_device.wait_recording(2)
-            model_predict(image)
-            break
+            word_predict = model_predict(image)
+            
+            #See what we got back from the model
+            if word_predict is not None:
+                print("Event Happened")
+                capture_video=True
+                print(word_predict)
+                break
+            else:
+                capture_video=False
+        
         else:
             capture_video = False
 
