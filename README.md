@@ -169,3 +169,12 @@ rm ~/opencv.zip
 rm -rf ~/opencv-3.3.0
 ```
 
+
+## Download Models
+As of right now, the Microsoft ELL supports Neural Network Models that were trained with Microsoft Cognitive Toolkit(CNTK) or with Darknet. Follow the given tutorial for insights in how to download model with the ELL Library. [Importing Models.](https://microsoft.github.io/ELL/tutorials/Importing-models/)
+
+## Running Applications
+Rough Draft.
+- Do the Make Model part of the ELL tutorial
+- Do the pi3 folder part of the ELL
+- Do the actual running of the project as well
