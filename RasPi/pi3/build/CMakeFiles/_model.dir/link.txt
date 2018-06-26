@@ -1,0 +1,1 @@
+/usr/bin/c++  -fPIC -O3 -DNDEBUG  -shared -Wl,-soname,_model.so -o _model.so CMakeFiles/_model.dir/modelPYTHON_wrap.cxx.o ../model.obj /usr/lib/arm-linux-gnueabihf/libpython3.5m.so /usr/lib/libopenblas.so 
