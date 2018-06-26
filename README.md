@@ -2,16 +2,16 @@
 The overall purpose of this document is showcase example of Azure Machine Learning on IoT Edge Devices using Microsoft Embedded Learning Library (ELL)
 
 ## Table of Contents
-1. Windows Device Set Up -- Make Links
+1. [Windows Device Set Up](https://github.com/CatalystCode/MLontheEdge/tree/dev#window-device-set-up)
 * [ELL for Windows Devices](https://github.com/Microsoft/ELL/blob/master/INSTALL-Windows.md) 
-2. Set Up for Raspberry Pi Devices -- Make Links
+2. [Set Up for Raspberry Pi Devices](https://github.com/CatalystCode/MLontheEdge/tree/dev#set-up-for-raspberry-pi-devices)
 * Python 3.5.3
 * Change Hostname
 * Camera Set up
 * Enable SSH
-3. Programming Tools
-3. Download PreTrained Model -- Make Links
-4. Running Application --Make Links
+3. [Programming Tools](https://github.com/CatalystCode/MLontheEdge/tree/dev#programming-tools)
+3. [Download PreTrained Model](https://github.com/CatalystCode/MLontheEdge/tree/dev#download-models)
+4. [Running Application](https://github.com/CatalystCode/MLontheEdge/tree/dev#running-applications)
 
 ## Window Device Set Up
 The first step is to install Microsoft ELL on your host device. In order to do so, simply follow the directions in the link provided: [Microsoft ELL](https://github.com/Microsoft/ELL/blob/master/INSTALL-Windows.md)
@@ -174,7 +174,25 @@ rm -rf ~/opencv-3.3.0
 As of right now, the Microsoft ELL supports Neural Network Models that were trained with Microsoft Cognitive Toolkit(CNTK) or with Darknet. Follow the given tutorial for insights in how to download model with the ELL Library. [Importing Models.](https://microsoft.github.io/ELL/tutorials/Importing-models/)
 
 ## Running Applications
-Rough Draft.
-- Do the Make Model part of the ELL tutorial
-- Do the pi3 folder part of the ELL
-- Do the actual running of the project as well
+The steps below show how the given Azure ML on Edge Project is deployed
+1. Clone or Download the given repository:
+```
+git clone https://github.com/CatalystCode/MLontheEdge.git
+```
+2. Switch in the MLontheEdge and Raspi Folders
+```bash
+cd MLontheEdge/Raspi/
+```
+3. Run the Edge.py script adapted specially for the Raspberry Pi
+```python
+python3 Edge.py
+```
+4. While the script is running, a camera preview window will be opened allow you to see what the picamera sees. The scripts takes a picture every 5 seconds and returns what the model thinks it sees in that picture.
+5. If the model and python script recognize an object, a video is captured of the 10 seconds before that moment and 15 seconds after the given moment and then saved in a new directory **myvideos.** 
+```bash
+cd myvideos\
+```
+6. The video is in .mp4 format and can be viewed with any MP4 video player or even from the command line:
+```bash
+omxplayer "filename"
+```
