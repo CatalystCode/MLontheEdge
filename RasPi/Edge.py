@@ -8,7 +8,8 @@ import sys
 import io
 import termios
 import tty
-import time 
+import time
+import logging
 import picamera
 import cv2
 import ellmanager as emanager
@@ -23,6 +24,7 @@ def run_shell(cmd):
     Used for running shell commands
     """
     output = subprocess.check_output(cmd.split(' '))
+    logging.debug('Running shell command')
     return str(output.rstrip().decode())
 
 def save_video(capture_rate,input_path,output_path,rename_path):
@@ -31,6 +33,7 @@ def save_video(capture_rate,input_path,output_path,rename_path):
     run_shell(mp4_box)
     os.remove(input_path)
     os.rename(output_path,rename_path)
+    logging.debug('Video Saved')
 
 
 def model_predict(image):
@@ -55,10 +58,10 @@ def get_video():
     preroll = 10
     get_key = True
     capture_video = False
-    
     camera_res = (256,256)
     image = numpy.empty((camera_res[1], camera_res[0],3), dtype=numpy.uint8)
 
+    #Set up Circular Buffer Settings
     video_stream = picamera.PiCameraCircularIO(camera_device, seconds=capture_time)
     camera_device.start_preview()
     camera_device.start_recording(video_stream, format='h264')
@@ -68,22 +71,24 @@ def get_video():
         my_later = datetime.now()
         difference = my_later-my_now
         camera_device.wait_recording(1)
-        print("a")
+        logging.debug('Analyzing Surroundings')
         if difference.seconds > preroll+1:
             # Take Picture
-            print("b")
+            logging.debug('Prediction Captured')
             camera_device.capture(image,'bgr',resize=camera_res,use_video_port=True)
             camera_device.wait_recording(2)
             word_predict = model_predict(image)
-            print("c")
+            logging.debug('Prediction Returned')
+            
             #See what we got back from the model
             if word_predict is not None:
-                print("Event Happened")
+                logging.debug('Event Registered')
                 capture_video=True
-                print(word_predict)
+                print('Prediction(s): {}'.format(word_predict))
                 difference = 0
                 break
             else:
+                logging.debug('No Event Registered')
                 difference = 0
                 capture_video=False
     
@@ -137,13 +142,18 @@ def main():
     #Define Variables
     global camera_device
     capture_rate = 30.0
-    
+
+    #Intialize Log Properties
+    logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s') 
+
     ## Set the camera properties up
     camera_device = picamera.PiCamera()
     camera_device.resolution = (1280, 720)
     camera_device.framerate = capture_rate
+    
+    #Constantly run the Edge.py Script
     while True:
-        print("Starting Get Video")
+        logging.debug('Starting Edge.py')
         get_video()
 
 if __name__ == '__main__':
