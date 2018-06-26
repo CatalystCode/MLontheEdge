@@ -70,9 +70,10 @@ def get_video():
     while True:
         my_later = datetime.now()
         difference = my_later-my_now
+        seconds_past = difference.seconds
         camera_device.wait_recording(1)
         logging.debug('Analyzing Surroundings')
-        if difference.seconds > preroll+1:
+        if seconds_past > preroll+1:
             # Take Picture
             logging.debug('Prediction Captured')
             camera_device.capture(image,'bgr',resize=camera_res,use_video_port=True)
@@ -85,11 +86,12 @@ def get_video():
                 logging.debug('Event Registered')
                 capture_video=True
                 print('Prediction(s): {}'.format(word_predict))
-                difference = 0
+                seconds_past = 0
                 break
             else:
                 logging.debug('No Event Registered')
-                difference = 0
+                seconds_past = 0
+                my_now = datetime.now()
                 capture_video=False
     
     ## Create diretory to save the video that we get if we are told to capture video
@@ -135,7 +137,7 @@ def get_video():
         #Combine the two mp4 videos into one and save it
         full_video = "MP4Box -cat {0} -cat {1} -new {2}".format(before_mp4_path, after_mp4_path, full_video_path)
         run_shell(full_video)
-        
+        logging.debug('Combining Full Video')
         camera_device.stop_recording()
 
 def main():
