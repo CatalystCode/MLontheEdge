@@ -28,37 +28,37 @@ The first step is to install Microsoft ELL on your host device. In order to do s
     <td>Raspberry Pi 3</td>
     <td>Main device for running software</td>
     <td style="text-align:right">$37.00</td>
-    <td><a target="_blank" href="https://ebay.to/2KlncsD">purchase</a></td>
+    <td><a target="_blank" href="https://ebay.to/2KlncsD">Purchase</a></td>
   </tr>
   <tr>
     <td>Sandisk Ultra 32GB Micro SDHC</td>
     <td>Will store the Raspbian Operating System image and software for the Raspberry Pi 3</td>
     <td style="text-align:right">$12.00</td>
-    <td><a target="_blank" href="http://a.co/eCokiTM">purchase</a></td>
+    <td><a target="_blank" href="http://a.co/eCokiTM">Purchase</a></td>
   </tr>
   <tr>
     <td>Raspberry Pi Camera</td>
     <td>Used to capture images and video on the Pi</td>
     <td style="text-align:right">$6.00</td>
-    <td><a target="_blank" href="https://ebay.to/2Kv1ezf">purchase</a></td>
+    <td><a target="_blank" href="https://ebay.to/2Kv1ezf">Purchase</a></td>
   </tr>
   <tr>
     <td>USB Keyboard</td>
     <td>WIRED CONNECTION: Keyboard control for the Pi</td>
     <td style="text-align:right">$15.00</td>
-    <td><a target="_blank" href="https://ebay.to/2IGqv7U">purchase</a></td>
+    <td><a target="_blank" href="https://ebay.to/2IGqv7U">Purchase</a></td>
   </tr>
   <tr>
     <td>USB Mouse</td>
     <td>WIRED CONNECTION: Mouse control for the Pi</td>
     <td style="text-align:right">$6.00</td>
-    <td><a target="_blank" href="https://ebay.to/2Kmdsy4">purchase</a></td>
+    <td><a target="_blank" href="https://ebay.to/2Kmdsy4">Purchase</a></td>
   </tr>
   <tr>
     <td>Ethernet Cable</td>
     <td>WIRED CONNECTION: Network connection for the Pi</td>
-    <td style="text-align:right">4.00</td>
-    <td><a target="_blank" href="https://ebay.to/2Naib3V">purchase</a></td>
+    <td style="text-align:right">$4.00</td>
+    <td><a target="_blank" href="https://ebay.to/2Naib3V">Purchase</a></td>
   </tr>
 
 </table>
