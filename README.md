@@ -16,6 +16,53 @@ The overall purpose of this document is showcase example of Azure Machine Learni
 ## Window Device Set Up
 The first step is to install Microsoft ELL on your host device. In order to do so, simply follow the directions in the link provided: [Microsoft ELL](https://github.com/Microsoft/ELL/blob/master/INSTALL-Windows.md)
 
+## Acquiring Equipment
+<table>
+  <tr>
+    <th>Item</th>
+    <th>Description</th>
+    <th style = "text-align:right">Est. Cost (USD)</th>
+    <th>Purchase Link</th>
+  </tr>
+    <tr>
+    <td>Raspberry Pi 3</td>
+    <td>Main device for running software</td>
+    <td style="text-align:right">$37.00</td>
+    <td><a target="_blank" href="https://ebay.to/2KlncsD">purchase</a></td>
+  </tr>
+  <tr>
+    <td>Sandisk Ultra 32GB Micro SDHC</td>
+    <td>Will store the Raspbian Operating System image and software for the Raspberry Pi 3</td>
+    <td style="text-align:right">$12.00</td>
+    <td><a target="_blank" href="http://a.co/eCokiTM">purchase</a></td>
+  </tr>
+  <tr>
+    <td>Raspberry Pi Camera</td>
+    <td>Used to capture images and video on the Pi</td>
+    <td style="text-align:right">$6.00</td>
+    <td><a target="_blank" href="https://ebay.to/2Kv1ezf">purchase</a></td>
+  </tr>
+  <tr>
+    <td>USB Keyboard</td>
+    <td>WIRED CONNECTION: Keyboard control for the Pi</td>
+    <td style="text-align:right">$15.00</td>
+    <td><a target="_blank" href="https://ebay.to/2IGqv7U">purchase</a></td>
+  </tr>
+  <tr>
+    <td>USB Mouse</td>
+    <td>WIRED CONNECTION: Mouse control for the Pi</td>
+    <td style="text-align:right">$6.00</td>
+    <td><a target="_blank" href="https://ebay.to/2Kmdsy4">purchase</a></td>
+  </tr>
+  <tr>
+    <td>Ethernet Cable</td>
+    <td>WIRED CONNECTION: Network connection for the Pi</td>
+    <td style="text-align:right">4.00</td>
+    <td><a target="_blank" href="https://ebay.to/2Naib3V">purchase</a></td>
+  </tr>
+
+</table>
+
 ## Set Up for Raspberry Pi Devices
 1. **Python 3.5.3:** These steps assume you are starting from an existing Raspbian install with Python 3.5.3 on it based on the [Raspbian Stretch image - 2018-04-18](http://downloads.raspberrypi.org/raspbian/images/raspbian-2018-04-19/2018-04-18-raspbian-stretch.zip) image
 
