@@ -2,17 +2,17 @@
 The overall purpose of this document is showcase example of Azure Machine Learning on IoT Edge Devices using Microsoft Embedded Learning Library (ELL)
 
 ## Table of Contents
-1. [Acquiring Equipments](https://github.com/CatalystCode/MLontheEdge/tree/dev#acquiring-equipment)
-2. [Windows Device Set Up](https://github.com/CatalystCode/MLontheEdge/tree/dev#window-device-set-up)
+1. [Acquiring Equipments](https://github.com/CatalystCode/MLontheEdge#acquiring-equipments)
+2. [Windows Device Set Up](https://github.com/CatalystCode/MLontheEdge#window-device-set-up)
 * [ELL for Windows Devices](https://github.com/Microsoft/ELL/blob/master/INSTALL-Windows.md) 
-3. [Set Up for Raspberry Pi Devices](https://github.com/CatalystCode/MLontheEdge/tree/dev#set-up-for-raspberry-pi-devices)
+3. [Set Up for Raspberry Pi Devices](https://github.com/CatalystCode/MLontheEdge#set-up-for-raspberry-pi-devices)
 * Python 3.5.3
 * Change Hostname
 * Camera Set up
 * Enable SSH
-4. [Programming Tools](https://github.com/CatalystCode/MLontheEdge/tree/dev#programming-tools)
-5. [Download PreTrained Model](https://github.com/CatalystCode/MLontheEdge/tree/dev#download-models)
-6. [Running Application](https://github.com/CatalystCode/MLontheEdge/tree/dev#running-applications)
+4. [Programming Tools](https://github.com/CatalystCode/MLontheEdge#programming-tools)
+5. [Download PreTrained Model](https://github.com/CatalystCode/MLontheEdge#download-models)
+6. [Running Application](https://github.com/CatalystCode/MLontheEdge#running-applications)
 
 ## Acquiring Equipments
 <table>
