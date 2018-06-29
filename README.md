@@ -2,19 +2,17 @@
 The overall purpose of this document is showcase example of Azure Machine Learning on IoT Edge Devices using Microsoft Embedded Learning Library (ELL)
 
 ## Table of Contents
-1. [Windows Device Set Up](https://github.com/CatalystCode/MLontheEdge/tree/dev#window-device-set-up)
+1. [Acquiring Equipments](https://github.com/CatalystCode/MLontheEdge/tree/dev#acquiring-equipment)
+2. [Windows Device Set Up](https://github.com/CatalystCode/MLontheEdge/tree/dev#window-device-set-up)
 * [ELL for Windows Devices](https://github.com/Microsoft/ELL/blob/master/INSTALL-Windows.md) 
-2. [Set Up for Raspberry Pi Devices](https://github.com/CatalystCode/MLontheEdge/tree/dev#set-up-for-raspberry-pi-devices)
+3. [Set Up for Raspberry Pi Devices](https://github.com/CatalystCode/MLontheEdge/tree/dev#set-up-for-raspberry-pi-devices)
 * Python 3.5.3
 * Change Hostname
 * Camera Set up
 * Enable SSH
-3. [Programming Tools](https://github.com/CatalystCode/MLontheEdge/tree/dev#programming-tools)
-3. [Download PreTrained Model](https://github.com/CatalystCode/MLontheEdge/tree/dev#download-models)
-4. [Running Application](https://github.com/CatalystCode/MLontheEdge/tree/dev#running-applications)
-
-## Window Device Set Up
-The first step is to install Microsoft ELL on your host device. In order to do so, simply follow the directions in the link provided: [Microsoft ELL](https://github.com/Microsoft/ELL/blob/master/INSTALL-Windows.md)
+4. [Programming Tools](https://github.com/CatalystCode/MLontheEdge/tree/dev#programming-tools)
+5. [Download PreTrained Model](https://github.com/CatalystCode/MLontheEdge/tree/dev#download-models)
+6. [Running Application](https://github.com/CatalystCode/MLontheEdge/tree/dev#running-applications)
 
 ## Acquiring Equipment
 <table>
@@ -60,8 +58,10 @@ The first step is to install Microsoft ELL on your host device. In order to do s
     <td style="text-align:right">$4.00</td>
     <td><a target="_blank" href="https://ebay.to/2Naib3V">Purchase</a></td>
   </tr>
-
 </table>
+
+## Window Device Set Up
+The first step is to install Microsoft ELL on your host device. In order to do so, simply follow the directions in the link provided: [Microsoft ELL](https://github.com/Microsoft/ELL/blob/master/INSTALL-Windows.md)
 
 ## Set Up for Raspberry Pi Devices
 1. **Python 3.5.3:** These steps assume you are starting from an existing Raspbian install with Python 3.5.3 on it based on the [Raspbian Stretch image - 2018-04-18](http://downloads.raspberrypi.org/raspbian/images/raspbian-2018-04-19/2018-04-18-raspbian-stretch.zip) image
