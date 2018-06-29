@@ -14,7 +14,7 @@ The overall purpose of this document is showcase example of Azure Machine Learni
 5. [Download PreTrained Model](https://github.com/CatalystCode/MLontheEdge/tree/dev#download-models)
 6. [Running Application](https://github.com/CatalystCode/MLontheEdge/tree/dev#running-applications)
 
-## Acquiring Equipment
+## Acquiring Equipments
 <table>
   <tr>
     <th>Item</th>
