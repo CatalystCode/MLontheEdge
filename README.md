@@ -2,16 +2,63 @@
 The overall purpose of this document is showcase example of Azure Machine Learning on IoT Edge Devices using Microsoft Embedded Learning Library (ELL)
 
 ## Table of Contents
-1. [Windows Device Set Up](https://github.com/CatalystCode/MLontheEdge/tree/dev#window-device-set-up)
+1. [Acquiring Equipments](https://github.com/CatalystCode/MLontheEdge/tree/dev#acquiring-equipment)
+2. [Windows Device Set Up](https://github.com/CatalystCode/MLontheEdge/tree/dev#window-device-set-up)
 * [ELL for Windows Devices](https://github.com/Microsoft/ELL/blob/master/INSTALL-Windows.md) 
-2. [Set Up for Raspberry Pi Devices](https://github.com/CatalystCode/MLontheEdge/tree/dev#set-up-for-raspberry-pi-devices)
+3. [Set Up for Raspberry Pi Devices](https://github.com/CatalystCode/MLontheEdge/tree/dev#set-up-for-raspberry-pi-devices)
 * Python 3.5.3
 * Change Hostname
 * Camera Set up
 * Enable SSH
-3. [Programming Tools](https://github.com/CatalystCode/MLontheEdge/tree/dev#programming-tools)
-3. [Download PreTrained Model](https://github.com/CatalystCode/MLontheEdge/tree/dev#download-models)
-4. [Running Application](https://github.com/CatalystCode/MLontheEdge/tree/dev#running-applications)
+4. [Programming Tools](https://github.com/CatalystCode/MLontheEdge/tree/dev#programming-tools)
+5. [Download PreTrained Model](https://github.com/CatalystCode/MLontheEdge/tree/dev#download-models)
+6. [Running Application](https://github.com/CatalystCode/MLontheEdge/tree/dev#running-applications)
+
+## Acquiring Equipments
+<table>
+  <tr>
+    <th>Item</th>
+    <th>Description</th>
+    <th style = "text-align:right">Est. Cost (USD)</th>
+    <th>Purchase Link</th>
+  </tr>
+    <tr>
+    <td>Raspberry Pi 3</td>
+    <td>Main device for running software</td>
+    <td style="text-align:right">$37.00</td>
+    <td><a target="_blank" href="https://ebay.to/2KlncsD">Purchase</a></td>
+  </tr>
+  <tr>
+    <td>Sandisk Ultra 32GB Micro SDHC</td>
+    <td>Will store the Raspbian Operating System image and software for the Raspberry Pi 3</td>
+    <td style="text-align:right">$12.00</td>
+    <td><a target="_blank" href="http://a.co/eCokiTM">Purchase</a></td>
+  </tr>
+  <tr>
+    <td>Raspberry Pi Camera</td>
+    <td>Used to capture images and video on the Pi</td>
+    <td style="text-align:right">$6.00</td>
+    <td><a target="_blank" href="https://ebay.to/2Kv1ezf">Purchase</a></td>
+  </tr>
+  <tr>
+    <td>USB Keyboard</td>
+    <td>WIRED CONNECTION: Keyboard control for the Pi</td>
+    <td style="text-align:right">$15.00</td>
+    <td><a target="_blank" href="https://ebay.to/2IGqv7U">Purchase</a></td>
+  </tr>
+  <tr>
+    <td>USB Mouse</td>
+    <td>WIRED CONNECTION: Mouse control for the Pi</td>
+    <td style="text-align:right">$6.00</td>
+    <td><a target="_blank" href="https://ebay.to/2Kmdsy4">Purchase</a></td>
+  </tr>
+  <tr>
+    <td>Ethernet Cable</td>
+    <td>WIRED CONNECTION: Network connection for the Pi</td>
+    <td style="text-align:right">$4.00</td>
+    <td><a target="_blank" href="https://ebay.to/2Naib3V">Purchase</a></td>
+  </tr>
+</table>
 
 ## Window Device Set Up
 The first step is to install Microsoft ELL on your host device. In order to do so, simply follow the directions in the link provided: [Microsoft ELL](https://github.com/Microsoft/ELL/blob/master/INSTALL-Windows.md)
