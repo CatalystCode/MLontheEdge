@@ -86,9 +86,10 @@ def get_video():
             camera_device.wait_recording(1)
             
             # Take Picture for Azure
-            image_path = "{0}/image-{1}".format(SCRIPT_DIR,my_later.strftime("%Y%m%d%H%M%S"))
+            image_path = "{0}/image-{1}.jpg".format(SCRIPT_DIR,my_later.strftime("%Y%m%d%H%M%S"))
+            print(image_path)
             camera_device.capture(image_path)
-            camera_device.wait_recoding(1)
+            camera_device.wait_recording(1)
 
             # Make Prediction with the first picture
             logging.debug('Prediction Captured')
