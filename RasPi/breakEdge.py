@@ -53,7 +53,7 @@ def model_predict(image):
         return word
 
 # Function to Upload a specified path to an object to Azure Blob Storage
-def azure_upload_from_pathb(blob_container,blob_name,blob_object,blob_format):
+def azure_upload_from_path(blob_container,blob_name,blob_object,blob_format):
     block_blob_service.create_blob_from_path(blob_container, blob_name,blob_object, content_settings=ContentSettings(content_type=blob_format))
 
 
@@ -105,7 +105,7 @@ def get_video():
                 print('Prediction(s): {}'.format(word_predict))
 
                 # Format specifically for the Good Folder
-                good_image_folder = "{0}/GoodImages".format(picture_container_name)
+                good_image_folder = "{0}/goodimages".format(picture_container_name)
                 
                 # Send the Picture to the Good Images Folder on Azure
                 azure_upload_from_path(good_image_folder, image_name, image_path, 'image/jpeg')
@@ -117,7 +117,7 @@ def get_video():
                 capture_video=False
                
                 # Format specifically for the Good Folder
-                bad_image_folder = "{0}/BadImages".format(picture_container_name)
+                bad_image_folder = "{0}/badimages".format(picture_container_name)
                 # Send Picture to the Bad Images Folder on Azure that can be used to retrain
                 azure_upload_from_path(bad_image_folder, image_name, image_path, 'image/jpeg')
 
@@ -166,11 +166,11 @@ def get_video():
         save_video(capture_rate, after_event_path, after_path_temp, after_mp4_path)
 
         # DELETE THIS LINE: Call a function here that automatically uploads to azure: Before
-        before_video_folder = "{0}/{1}".format(video_container_name, 'BeforeVideo')
+        before_video_folder = "{0}/{1}".format(video_container_name, 'beforevideo')
         azure_upload_from_path(before_video_folder, before_mp4, before_mp4_path, 'video/mp4')
 
         # DELETE THIS LINE: Call a function here that automatically uploads to azure: After
-        after_video_folder = "{0}/{1}".format(video_container_name, 'AfterVideo')
+        after_video_folder = "{0}/{1}".format(video_container_name, 'aftervideo')
         azure_upload_from_path(after_video_folder, after_mp4, after_mp4_path,'video/mp4')
 
         # Combine the two mp4 videos into one and save it
@@ -179,8 +179,8 @@ def get_video():
         logging.debug('Combining Full Video')
         
         # DELETE THIS LINE: Call a function here that automatically uploads to azure
-        full_video_folder = "{0}/{1}".format(video_container_name, 'FullVideo')
-        azure_upload_from_path(full_video_folder,fullpath,full_video_path,'video/mp4')
+        full_video_folder = "{0}/{1}".format(video_container_name, 'fullvideo')
+        azure_upload_from_path(full_video_folder,full_path,full_video_path,'video/mp4')
         camera_device.stop_recording()
 
 def main():
@@ -190,12 +190,15 @@ def main():
    
     # Intialize Azure Properties
     global block_blob_service
-    block_blob_service = BlockBlobService(account_name='*****', account_key='************************')
-
+    block_blob_service = BlockBlobService(account_name='**************', account_key='************************************')
+    
     # Create Neccesary Containers and Blobs
-    picture_container_name = 'EdgeImages'
-    video_container_name = 'EdgeVideos'
-    model_container_name = 'EdgeModels'
+    global picture_container_name
+    global video_container_name
+    global model_container_name
+    picture_container_name = 'edgeimages'
+    video_container_name = 'edgevideos'
+    model_container_name = 'edgemodels'
     block_blob_service.create_container(picture_container_name)
     block_blob_service.create_container(video_container_name)
     block_blob_service.create_container(model_container_name)
