@@ -2,6 +2,7 @@
 
 
 import os
+import shutil
 import random
 import subprocess
 import sys
@@ -109,7 +110,9 @@ def get_video():
                 
                 # Send the Picture to the Good Images Folder on Azure
                 azure_upload_from_path(good_image_folder, image_name, image_path, 'image/jpeg')
-
+                
+                #Once it is uploaded, delete the image
+                os.remove(image_path)
                 break
             else:
                 logging.debug('No Event Registered')
@@ -123,7 +126,8 @@ def get_video():
 
             seconds_past = 0
             # Delete the image from the OS folder to save space
-    
+            os.remove(image_path)
+
     ## Create diretory to save the video that we get if we are told to capture video
     #start_time = datetime.now()
     start_time = my_later
@@ -182,7 +186,8 @@ def get_video():
         full_video_folder = "{0}/{1}".format(video_container_name, 'fullvideo')
         azure_upload_from_path(full_video_folder,full_path,full_video_path,'video/mp4')
         camera_device.stop_recording()
-
+    # Used to Delete Directory but it needs a time delat
+    #shutil.rmtree(video_dir_path)
 def main():
     # Define Variables
     global camera_device
@@ -190,7 +195,7 @@ def main():
    
     # Intialize Azure Properties
     global block_blob_service
-    block_blob_service = BlockBlobService(account_name='**************', account_key='************************************')
+    block_blob_service = BlockBlobService(account_name='******************', account_key='************************************')
     
     # Create Neccesary Containers and Blobs
     global picture_container_name
