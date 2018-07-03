@@ -30,10 +30,10 @@ def run_shell(cmd):
 
 def save_video(capture_rate,input_path,output_path,rename_path):
     # Convert each indivudul .h264 to mp4 
-    mp4_box = "MP4Box -fps {0} -quiet -add {1} {2}".format(capture_rate,input_path,output_path)
+    mp4_box = "MP4Box -fps {0} -quiet -add {1} {2}".format(capture_rate, input_path, output_path)
     run_shell(mp4_box)
     os.remove(input_path)
-    os.rename(output_path,rename_path)
+    os.rename(output_path, rename_path)
     logging.debug('Video Saved')
 
 
@@ -52,9 +52,10 @@ def model_predict(image):
         word = categories[top_5[0][0]]
         return word
 
-# Function to Upload to Blob Storage
-#def azure_upload():
-    
+# Function to Upload a specified path to an object to Azure Blob Storage
+def azure_upload_from_pathb(blob_container,blob_name,blob_object,blob_format):
+    block_blob_service.create_blob_from_path(blob_container, blob_name,blob_object, content_settings=ContentSettings(content_type=blob_format))
+
 
 def get_video():
     # Define Variables
@@ -82,11 +83,12 @@ def get_video():
         logging.debug('Analyzing Surroundings')
         if seconds_past > preroll+1:
             # Take Picture for the Model
-            camera_device.capture(image,'bgr',resize=camera_res,use_video_port=True)
+            camera_device.capture(image,'bgr', resize=camera_res, use_video_port=True)
             camera_device.wait_recording(1)
             
             # Take Picture for Azure
-            image_path = "{0}/image-{1}.jpg".format(SCRIPT_DIR,my_later.strftime("%Y%m%d%H%M%S"))
+            image_name = "image-{0}.jpg".format(my_later.strftime("%Y%m%d%H%M%S"))
+            image_path = "{0}/{1}".format(SCRIPT_DIR, image_name)
             print(image_path)
             camera_device.capture(image_path)
             camera_device.wait_recording(1)
@@ -102,23 +104,29 @@ def get_video():
                 capture_video=True
                 print('Prediction(s): {}'.format(word_predict))
 
+                # Format specifically for the Good Folder
+                good_image_folder = "{0}/GoodImages".format(picture_container_name)
+                
                 # Send the Picture to the Good Images Folder on Azure
-                # DELETE THIS LINE: Call a function here that automatically uploads to azure
+                azure_upload_from_path(good_image_folder, image_name, image_path, 'image/jpeg')
 
                 break
             else:
                 logging.debug('No Event Registered')
                 my_now = datetime.now()
                 capture_video=False
-
+               
+                # Format specifically for the Good Folder
+                bad_image_folder = "{0}/BadImages".format(picture_container_name)
                 # Send Picture to the Bad Images Folder on Azure that can be used to retrain
-                # DELETE THIS LINE: Call a function here that automatically uploads to azure
+                azure_upload_from_path(bad_image_folder, image_name, image_path, 'image/jpeg')
 
             seconds_past = 0
             # Delete the image from the OS folder to save space
     
     ## Create diretory to save the video that we get if we are told to capture video
-    start_time = datetime.now()
+    #start_time = datetime.now()
+    start_time = my_later
     base_dir = SCRIPT_DIR
     video_dir = "myvideos"
     video_dir_path ="{0}/{1}".format(base_dir, video_dir)
@@ -130,22 +138,22 @@ def get_video():
 
     ## We will have two seperate files, one for before and after the event had been triggered
     #Before:
-    before_event =         "video-{0}-{1}.h264".format("before",video_start_time.strftime("%Y%m%d%H%M%S"))
-    before_event_path =    "{0}/{1}/{2}".format(base_dir,video_dir,before_event)
-    before_mp4 =           before_event.replace('.h264','.mp4')
-    before_mp4_path =      "{0}/{1}/{2}".format(base_dir,video_dir,before_mp4)
+    before_event =         "video-{0}-{1}.h264".format("before", video_start_time.strftime("%Y%m%d%H%M%S"))
+    before_event_path =    "{0}/{1}/{2}".format(base_dir, video_dir, before_event)
+    before_mp4 =           before_event.replace('.h264', '.mp4')
+    before_mp4_path =      "{0}/{1}/{2}".format(base_dir, video_dir, before_mp4)
     before_path_temp =      "{0}.tmp".format(before_mp4_path)
 
     # After:
-    after_event =         "video-{0}-{1}.h264".format("after",video_start_time.strftime("%Y%m%d%H%M%S"))
-    after_event_path =    "{0}/{1}/{2}".format(base_dir,video_dir, after_event)
-    after_mp4 =           after_event.replace('.h264','.mp4')
-    after_mp4_path =      "{0}/{1}/{2}".format(base_dir,video_dir,after_mp4)
+    after_event =         "video-{0}-{1}.h264".format("after", video_start_time.strftime("%Y%m%d%H%M%S"))
+    after_event_path =    "{0}/{1}/{2}".format(base_dir, video_dir, after_event)
+    after_mp4 =           after_event.replace('.h264', '.mp4')
+    after_mp4_path =      "{0}/{1}/{2}".format(base_dir, video_dir, after_mp4)
     after_path_temp =     "{0}.tmp".format(after_mp4_path)
 
     # Full combined video path
-    full_path =           "video-{0}-{1}.mp4".format("full",video_start_time.strftime("%Y%m%d%H%M%S"))
-    full_video_path =     "{0}/{1}/{2}".format(base_dir,video_dir,full_path)
+    full_path =           "video-{0}-{1}.mp4".format("full", video_start_time.strftime("%Y%m%d%H%M%S"))
+    full_video_path =     "{0}/{1}/{2}".format(base_dir, video_dir, full_path)
 
     if capture_video == True:
         # Save the video to a file path specified
@@ -154,22 +162,25 @@ def get_video():
         camera_device.wait_recording(preroll+5)
                    
         # Convert to MP4 format for viewing
-        save_video(capture_rate,before_event_path,before_path_temp,before_mp4_path)
-        save_video(capture_rate,after_event_path,after_path_temp,after_mp4_path)
+        save_video(capture_rate, before_event_path, before_path_temp, before_mp4_path)
+        save_video(capture_rate, after_event_path, after_path_temp, after_mp4_path)
 
         # DELETE THIS LINE: Call a function here that automatically uploads to azure: Before
+        before_video_folder = "{0}/{1}".format(video_container_name, 'BeforeVideo')
+        azure_upload_from_path(before_video_folder, before_mp4, before_mp4_path, 'video/mp4')
 
         # DELETE THIS LINE: Call a function here that automatically uploads to azure: After
+        after_video_folder = "{0}/{1}".format(video_container_name, 'AfterVideo')
+        azure_upload_from_path(after_video_folder, after_mp4, after_mp4_path,'video/mp4')
 
- 
-        
         # Combine the two mp4 videos into one and save it
         full_video = "MP4Box -cat {0} -cat {1} -new {2}".format(before_mp4_path, after_mp4_path, full_video_path)
         run_shell(full_video)
         logging.debug('Combining Full Video')
         
         # DELETE THIS LINE: Call a function here that automatically uploads to azure
-        block_blob_service.create_blob_from_path('images', full_path, full_video_path, content_settings=ContentSettings(content_type='video/mp4'))
+        full_video_folder = "{0}/{1}".format(video_container_name, 'FullVideo')
+        azure_upload_from_path(full_video_folder,fullpath,full_video_path,'video/mp4')
         camera_device.stop_recording()
 
 def main():
@@ -180,6 +191,14 @@ def main():
     # Intialize Azure Properties
     global block_blob_service
     block_blob_service = BlockBlobService(account_name='*****', account_key='************************')
+
+    # Create Neccesary Containers and Blobs
+    picture_container_name = 'EdgeImages'
+    video_container_name = 'EdgeVideos'
+    model_container_name = 'EdgeModels'
+    block_blob_service.create_container(picture_container_name)
+    block_blob_service.create_container(video_container_name)
+    block_blob_service.create_container(model_container_name)
     
     # DELETE THIS LINE: Call a function here that automatically checks the model blob and downlods from azure
 
