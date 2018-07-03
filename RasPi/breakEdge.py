@@ -186,13 +186,22 @@ def get_video():
         full_video_folder = "{0}/{1}".format(video_container_name, 'fullvideo')
         azure_upload_from_path(full_video_folder,full_path,full_video_path,'video/mp4')
         camera_device.stop_recording()
+
     # Used to Delete Directory but it needs a time delat
     #shutil.rmtree(video_dir_path)
 def main():
     # Define Variables
     global camera_device
     capture_rate = 30.0
-   
+
+    # Intialize Log Properties
+    logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s') 
+
+    # Intilize Camera properties 
+    camera_device = picamera.PiCamera()
+    camera_device.resolution = (1280, 720)
+    camera_device.framerate = capture_rate
+
     # Intialize Azure Properties
     global block_blob_service
     block_blob_service = BlockBlobService(account_name='******************', account_key='************************************')
@@ -209,14 +218,13 @@ def main():
     block_blob_service.create_container(model_container_name)
     
     # DELETE THIS LINE: Call a function here that automatically checks the model blob and downlods from azure
+    compressed_model_dir = "pi3"
+    compressed_model_dir_path ="{0}/{1}".format(SCRIPT_DIR, compressed_model_dir)
 
-    # Intialize Log Properties
-    logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s') 
-
-    # Intilize Camera properties 
-    camera_device = picamera.PiCamera()
-    camera_device.resolution = (1280, 720)
-    camera_device.framerate = capture_rate
+    if not os.path.exists(compressed_model_dir_path):
+        logging.debug("There is no compressed model in a pi3 folder on this device")
+    else:
+        block_blob_service.create_blob_from_path(model_container_name, compressed_model_dir ,compressed_model_dir_path )
 
     # Constantly run the Edge.py Script
     while True:
