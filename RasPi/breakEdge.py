@@ -52,6 +52,10 @@ def model_predict(image):
         word = categories[top_5[0][0]]
         return word
 
+# Function to Upload to Blob Storage
+#def azure_upload():
+    
+
 def get_video():
     # Define Variables
     capture_time = 30
