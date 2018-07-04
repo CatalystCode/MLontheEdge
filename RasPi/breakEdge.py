@@ -204,7 +204,7 @@ def main():
 
     # Intialize Azure Properties
     global block_blob_service
-    block_blob_service = BlockBlobService(account_name='******************', account_key='************************************')
+    block_blob_service = BlockBlobService(account_name='******************', account_key='**************************')
     
     # Create Neccesary Containers and Blobs
     global picture_container_name
@@ -218,14 +218,26 @@ def main():
     block_blob_service.create_container(model_container_name)
     
     # DELETE THIS LINE: Call a function here that automatically checks the model blob and downlods from azure
-    compressed_model_dir = "pi3"
-    compressed_model_dir_path ="{0}/{1}".format(SCRIPT_DIR, compressed_model_dir)
+    model_dir = "pi3"
+    model_dir_path = "{0}/{1}".format(SCRIPT_DIR, model_dir)
+    compressed_model_dir = "zippedpi3"
+    compressed_model_dir_path ="{0}/{1}.zip".format(SCRIPT_DIR, compressed_model_dir)
+    
+    
+    #if not os.path.exists(model_dir_path):
+    #    logging.debug("There is no compressed model in a pi3 folder on this device")
+        # Download the Zipped Version from Azure Blob Storage
+        
+    #else:
+    #    print("Bout to start zipping. This will take about 30 seconds. Please be patient")
+        
+    #    shutil.make_archive(compressed_model_dir,'zip',model_dir_path)
+        
+    #    print("We finished Compressing this package")
+    #    block_blob_service.create_blob_from_path(model_container_name, compressed_model_dir ,compressed_model_dir_path)
 
-    if not os.path.exists(compressed_model_dir_path):
-        logging.debug("There is no compressed model in a pi3 folder on this device")
-    else:
-        block_blob_service.create_blob_from_path(model_container_name, compressed_model_dir ,compressed_model_dir_path )
-
+    print(compressed_model_dir_path)
+    block_blob_service.create_blob_from_path(model_container_name, compressed_model_dir ,compressed_model_dir_path)
     # Constantly run the Edge.py Script
     while True:
         logging.debug('Starting Edge.py')
