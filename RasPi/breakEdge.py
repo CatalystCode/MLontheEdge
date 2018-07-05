@@ -58,6 +58,62 @@ def model_predict(image):
 def azure_upload_from_path(blob_container,blob_name,blob_object,blob_format):
     block_blob_service.create_blob_from_path(blob_container, blob_name,blob_object, content_settings=ContentSettings(content_type=blob_format))
 
+def azure_download_from_path(model_container_name, model_dir_path, compressed_model_dir_path, compressed_model_name):
+    #Download Azure Version to the Raspberry pi
+        block_blob_service.get_blob_to_path(model_container_name, compressed_model_name, compressed_model_dir_path)
+        os.makedirs(model_dir_path)
+        zf = zipfile.ZipFile(compressed_model_dir_path)
+        zf.extractall(model_dir_path)
+
+def azure_model_setup(model_container_name):
+    # DELETE THIS LINE: Call a function here that automatically checks the model blob and downlods from azure
+    model_dir = "pi3"
+    model_dir_path = "{0}/{1}".format(SCRIPT_DIR, model_dir)
+    compressed_model_name = "zipped{0}".format(model_dir)
+    compressed_model_dir_path ="{0}/{1}.zip".format(SCRIPT_DIR, compressed_model_name)
+   
+    # This Needs to be More efficient 
+    # There should really only be one model in the edge model blob
+    model_count = 0
+    azure_model = block_blob_service.list_blobs(model_container_name)
+    for item in azure_model:
+        model_count+=1
+
+    if (model_count == 0):
+        if not os.path.exists(model_dir_path):
+            logging.debug("There is no pi3 folder on this device or on the Azure Blob Storage Account. GOODBYE!")
+            sys.exit(1)
+        else:
+            logging.debug("No 'zippedpi3' folder found on Azure. About 20 seconds to compress and upload located pi3 to Azure")
+            shutil.make_archive(compressed_model_name,'zip',model_dir_path)
+            logging.debug("We finished Compressing this package")
+            azure_upload_from_path(model_container_name, compressed_model_name, compressed_model_dir_path, 'application/zip')
+            os.remove(compressed_model_dir_path)
+    else:
+        if not os.path.exists(model_dir_path):
+            logging.debug("No 'pi3' folder found on device. Downloading and uncompresing folder from Azure Blob Storage")
+            # Download the Zipped Version from Azure Blob Storage
+            azure_download_from_path(model_container_name, model_dir_path,compressed_model_dir_path,compressed_model_name)
+            logging.debug("'pi3' Download Completed")
+            # Remove all remaining zip files in the folder
+            os.remove(compressed_model_dir_path)
+        else:
+            logging.debug("Checking model version. Looking for possible updates")
+            time_now = datetime.now()
+            hour_now = time_now.hour
+
+            for blob in azure_model:
+                blob_hour_change = blob.properties.last_modified.hour
+
+            if( abs(blob_hour_change-hour_now) >= 3):
+                # Delete Current pi3 folder
+                shutil.rmtree(model_dir_path)
+                # Download Azure Version to the Raspberry pi
+                azure_download_from_path(model_container_name, model_dir_path, compressed_model_dir_path, compressed_model_name)
+                # Upload it back to Azure to get a new modification time
+                azure_upload_from_path(model_container_name, compressed_model_name, compressed_model_dir_path, 'application/zip')
+                # Delete the unneccesary zip file
+                os.remove(compressed_model_dir_path)
 
 def get_video():
     # Define Variables
@@ -176,7 +232,7 @@ def get_video():
 
         # DELETE THIS LINE: Call a function here that automatically uploads to azure: After
         after_video_folder = "{0}/{1}".format(video_container_name, 'aftervideo')
-        azure_upload_from_path(after_video_folder, after_mp4, after_mp4_path,'video/mp4')
+        azure_upload_from_path(after_video_folder, after_mp4, after_mp4_path, 'video/mp4')
 
         # Combine the two mp4 videos into one and save it
         full_video = "MP4Box -cat {0} -cat {1} -new {2}".format(before_mp4_path, after_mp4_path, full_video_path)
@@ -185,14 +241,23 @@ def get_video():
         
         # DELETE THIS LINE: Call a function here that automatically uploads to azure
         full_video_folder = "{0}/{1}".format(video_container_name, 'fullvideo')
-        azure_upload_from_path(full_video_folder,full_path,full_video_path,'video/mp4')
+        azure_upload_from_path(full_video_folder, full_path, full_video_path, 'video/mp4')
         camera_device.stop_recording()
 
     # Used to Delete Directory but it needs a time delat
     #shutil.rmtree(video_dir_path)
+
 def main():
-    # Define Variables
+    # Define Globals
     global camera_device
+    global block_blob_service
+
+    # Maybe Make these none globals
+    global picture_container_name
+    global video_container_name
+    global model_container_name
+   
+    #Define Varibles
     capture_rate = 30.0
 
     # Intialize Log Properties
@@ -204,13 +269,9 @@ def main():
     camera_device.framerate = capture_rate
 
     # Intialize Azure Properties
-    global block_blob_service
     block_blob_service = BlockBlobService(account_name='****************', account_key='***************************************')
     
     # Create Neccesary Containers and Blobs if they don't exist already
-    global picture_container_name
-    global video_container_name
-    global model_container_name
     picture_container_name = 'edgeimages'
     video_container_name = 'edgevideos'
     model_container_name = 'edgemodels'
@@ -218,61 +279,9 @@ def main():
     block_blob_service.create_container(video_container_name)
     block_blob_service.create_container(model_container_name)
     
-    # DELETE THIS LINE: Call a function here that automatically checks the model blob and downlods from azure
-    model_dir = "pi3"
-    model_dir_path = "{0}/{1}".format(SCRIPT_DIR, model_dir)
-    compressed_model_name = "zipped{0}".format(model_dir)
-    compressed_model_dir_path ="{0}/{1}.zip".format(SCRIPT_DIR, compressed_model_name)
-   
-    # This Needs to be More efficient 
-    model_count = 0
-    azure_model = block_blob_service.list_blobs(model_container_name)
-    for item in azure_model:
-        model_count+=1
-
-    if (model_count == 0):
-        if not os.path.exists(model_dir_path):
-            logging.debug("There is no pi3 folder on this device or on the Azure Blob Storage Account. GOODBYE!")
-            sys.exit(1)
-        else:
-            logging.debug("No 'zippedpi3' folder found on Azure. About 20 seconds to compress and upload located pi3 to Azure")
-            shutil.make_archive(compressed_model_name,'zip',model_dir_path)
-            logging.debug("We finished Compressing this package")
-            azure_upload_from_path(model_container_name, compressed_model_name, compressed_model_dir_path, 'application/zip')
-            os.remove(compressed_model_dir_path)
-    else:
-        if not os.path.exists(model_dir_path):
-            logging.debug("No 'pi3' folder found on device. Downloading and uncompresing folder from Azure Blob Storage")
-            # Download the Zipped Version from Azure Blob Storage
-            block_blob_service.get_blob_to_path(model_container_name, compressed_model_name, compressed_model_dir_path)
-            # Make the 'pi3' directory to save all the extracted things into.
-            os.makedirs(model_dir_path)
-            # Do the actual extractions
-            zf = zipfile.ZipFile(compressed_model_dir_path)
-            zf.extractall(model_dir_path)
-            logging.debug("'pi3' Download Completed")
-            # Remove all remaining zip files in the folder
-            os.remove(compressed_model_dir_path)
-        else:
-            logging.debug("Checking model version. Looking for possible updates")
-            time_now = datetime.now()
-            hour_now = time_now.hour
-
-            for blob in azure_model:
-                blob_hour_change = blob.properties.last_modified.hour
-
-            if(abs(blob_hour_change-hour_now) >= 1):
-                #Delete Current pi3 folder
-                shutil.rmtree(model_dir_path)
-                #Download Azure Version to the Raspberry pi
-                block_blob_service.get_blob_to_path(model_container_name, compressed_model_name, compressed_model_dir_path)
-                os.makedirs(model_dir_path)
-                zf = zipfile.ZipFile(compressed_model_dir_path)
-                zf.extractall(model_dir_path)
-                #Upload it back to Azure
-                azure_upload_from_path(model_container_name, compressed_model_name, compressed_model_dir_path, 'application/zip')
-                os.remove(compressed_model_dir_path)
-
+    # Make sure the neccessary 'pi3' folder is up to date from azure.
+    azure_model_setup(model_container_name)
+    
     # Constantly run the Edge.py Script
     while True:
         logging.debug('Starting Edge.py')
