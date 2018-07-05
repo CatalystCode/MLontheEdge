@@ -13,8 +13,9 @@ import time
 import logging
 import picamera
 import cv2
+import zipfile
 import ellmanager as emanager
-import model
+#import model
 import numpy as numpy
 from datetime import datetime, timedelta
 from azure.storage.blob import BlockBlobService, ContentSettings, PublicAccess
@@ -204,7 +205,7 @@ def main():
 
     # Intialize Azure Properties
     global block_blob_service
-    block_blob_service = BlockBlobService(account_name='*****************', account_key='***************************')
+    block_blob_service = BlockBlobService(account_name='*********', account_key='****************************************')
     
     # Create Neccesary Containers and Blobs if they don't exist already
     global picture_container_name
@@ -223,21 +224,26 @@ def main():
     compressed_model_name = "zipped{0}".format(model_dir)
     compressed_model_dir_path ="{0}/{1}.zip".format(SCRIPT_DIR, compressed_model_name)
     
-    
-    if not os.path.exists(model_dir_path):
-        logging.debug("There is no compressed model in a pi3 folder on this device")
-        # Download the Zipped Version from Azure Blob Storage
-        block_blob_service.get_blob_to_path(model_container_name,compressed_model_name,compressed_model_dir_path)
-        
-    else:
-        print("Bout to start zipping. This will take about 30 seconds. Please be patient")
-        
-        shutil.make_archive(compressed_model_name,'zip',model_dir_path)
-        
-        print("We finished Compressing this package")
+    azure_model = block_blob_service.list_blobs(model_container_name)
+    if azure_model is None:
+        if not os.path.exists(model_dir_path):
+            logging.debug("There is no compressed model in a pi3 folder on this device")
+            # Download the Zipped Version from Azure Blob Storage
+            block_blob_service.get_blob_to_path(model_container_name,compressed_model_name,compressed_model_dir_path)
+            #Make the 'pi3' directory to save all the extracted things into.
+            os.makedirs(model_dir_path)
+            #Do the actual extractions
+            zf = zipfile.ZipFile(compressed_model_dir_path)
+            zf.extractall(model_dir_path)
+            print("Finished Downloading")
+        else:
+            print("Bout to start zipping. This will take about 30 seconds. Please be patient")
+            shutil.make_archive(compressed_model_name,'zip',model_dir_path)
+            print("We finished Compressing this package")
 
-    azure_upload_from_path(model_container_name, compressed_model_name, compressed_model_dir_path, 'application/zip')
+        azure_upload_from_path(model_container_name, compressed_model_name, compressed_model_dir_path, 'application/zip')
     
+    os.remove(compressed_model_dir_path)
     # Constantly run the Edge.py Script
     while True:
         logging.debug('Starting Edge.py')
