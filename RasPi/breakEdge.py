@@ -227,23 +227,29 @@ def main():
     azure_model = block_blob_service.list_blobs(model_container_name)
     if azure_model is None:
         if not os.path.exists(model_dir_path):
+            logging.debug("There is no pi3 folder on this device or on the Azure Blob Storage Account. GOODBYE!")
+            sys.exit(0)
+        else:
+            logging.debug("No 'zippedpi3' folder found on Azure. About 20 seconds to compress and upload located pi3 to Azure")
+            shutil.make_archive(compressed_model_name,'zip',model_dir_path)
+            logging.debug("We finished Compressing this package")
+            azure_upload_from_path(model_container_name, compressed_model_name, compressed_model_dir_path, 'application/zip')
+    else:
+            # Need to Account for Model Modifications here.
+            
             logging.debug("There is no compressed model in a pi3 folder on this device")
             # Download the Zipped Version from Azure Blob Storage
             block_blob_service.get_blob_to_path(model_container_name,compressed_model_name,compressed_model_dir_path)
-            #Make the 'pi3' directory to save all the extracted things into.
+            # Make the 'pi3' directory to save all the extracted things into.
             os.makedirs(model_dir_path)
-            #Do the actual extractions
+            # Do the actual extractions
             zf = zipfile.ZipFile(compressed_model_dir_path)
             zf.extractall(model_dir_path)
-            print("Finished Downloading")
-        else:
-            print("Bout to start zipping. This will take about 30 seconds. Please be patient")
-            shutil.make_archive(compressed_model_name,'zip',model_dir_path)
-            print("We finished Compressing this package")
-
-        azure_upload_from_path(model_container_name, compressed_model_name, compressed_model_dir_path, 'application/zip')
+            logging.debug("'pi3' Download Completed")
     
+    # Remove all remaining zip files in the folder
     os.remove(compressed_model_dir_path)
+    
     # Constantly run the Edge.py Script
     while True:
         logging.debug('Starting Edge.py')
