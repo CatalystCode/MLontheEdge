@@ -61,13 +61,13 @@ def json_fill(video_time, word_prediction, predicition_value, video_name, json_p
             'sysTime':               str(datetime.now().isoformat()) + 'Z',
             'videoStartTime':        str(video_time.isoformat()) + 'Z',
             'prediction(s)':         word_prediction,
-            'predictionConfidence':  predicition_value,
+            'predictionConfidence':  str(predicition_value),
             'videoName':             video_name
         }
     }
     
     logging.debug("Rewriting Json to File")
-    with open(json_file_path, 'w') as json_file:
+    with open(json_path, 'w') as json_file:
         json.dump(json_messge, json_file)
 
 # Function to Upload a specified path to an object to Azure Blob Storage
@@ -190,6 +190,7 @@ def get_video():
                 bad_image_folder = "{0}/badimages".format(picture_container_name)
                 # Send Picture to the Bad Images Folder on Azure that can be used to retrain
                 azure_upload_from_path(bad_image_folder, image_name, image_path, 'image/jpeg')
+                camera_device.wait_recording(2)
             else:
                 # See what we got back from the model
                 logging.debug('Event Registered')
@@ -199,6 +200,7 @@ def get_video():
                 good_image_folder = "{0}/goodimages".format(picture_container_name)
                 # Send the Picture to the Good Images Folder on Azure
                 azure_upload_from_path(good_image_folder, image_name, image_path, 'image/jpeg')
+                camera_device.wait_recording(2)
                 # Once it is uploaded, delete the image
                 os.remove(image_path)
                 break
@@ -238,7 +240,7 @@ def get_video():
     full_video_path =     "{0}/{1}/{2}".format(base_dir, video_dir, full_path)
 
     # Create a json file to a reference the given event
-    json_file_name = "{0}.json".format(full_path)
+    json_file_name = "video-description-{0}.json".format(video_start_time.strftime("%Y%m%d%H%M%S"))
     json_file_path = "{0}/{1}/{2}".format(base_dir,video_dir, json_file_name)
 
     if capture_video == True:
@@ -271,9 +273,11 @@ def get_video():
         # Create json and fill it with information
         json_fill(video_start_time, word, predict_value, full_path, json_file_path)
 
-        #Upload Json to Azure Blob Storge
+        # Upload Json to Azure Blob Storge
         azure_upload_from_path(json_container_name, json_file_name, json_file_path, 'application/json')
-        
+       
+        # End Things
+        shutil.rmtree(video_dir_path)
         camera_device.stop_recording()
 
     # Used to Delete Directory but it needs a time delat
@@ -300,9 +304,13 @@ def main():
     camera_device = picamera.PiCamera()
     camera_device.resolution = (1280, 720)
     camera_device.framerate = capture_rate
+    
+    if camera_device is None:
+        logging.debug("No Camera Device Found.")
+        sys.exit(1)
 
     # Intialize Azure Properties
-    block_blob_service = BlockBlobService(account_name='************', account_key='***************************')
+    block_blob_service = BlockBlobService(account_name='****************', account_key='***********************************')
     
     # Create Neccesary Containers and Blobs if they don't exist already
     picture_container_name = 'edgeimages'
