@@ -15,7 +15,7 @@ import picamera
 import cv2
 import zipfile
 import ellmanager as emanager
-#import model
+import model
 import numpy as numpy
 from datetime import datetime, timedelta
 from azure.storage.blob import BlockBlobService, ContentSettings, PublicAccess
@@ -154,6 +154,8 @@ def get_video():
             # Make Prediction with the first picture
             logging.debug('Prediction Captured')
             word_predict = model_predict(image)
+            # Give time here for model predictions
+            camera_device.wait_recording(3)
             logging.debug('Prediction Returned')
             
             # See what we got back from the model
@@ -269,7 +271,7 @@ def main():
     camera_device.framerate = capture_rate
 
     # Intialize Azure Properties
-    block_blob_service = BlockBlobService(account_name='****************', account_key='***************************************')
+    block_blob_service = BlockBlobService(account_name='mlonedge2018', account_key='Us6MOxp3edfXgP2YXxoiFlJPJMRVAfSTv8Gaaj6LIJXK30JL54aG7/woG6OWbS0g0kBuyEf7PfGkUDTULhq+jg==')
     
     # Create Neccesary Containers and Blobs if they don't exist already
     picture_container_name = 'edgeimages'
