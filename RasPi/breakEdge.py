@@ -1,22 +1,22 @@
 #!/usr/bin/env python3
 
-
-import os
-import shutil
-import random
-import subprocess
-import sys
-import io
-import termios
-import tty
-import time
-import logging
-import picamera
 import cv2
-import zipfile
 import ellmanager as emanager
+import io
+import json
+import logging
 import model
 import numpy as numpy
+import os
+import picamera
+import random
+import shutil
+import subprocess
+import sys
+import termios
+import time
+import tty
+import zipfile
 from datetime import datetime, timedelta
 from azure.storage.blob import BlockBlobService, ContentSettings, PublicAccess
 
@@ -54,6 +54,21 @@ def model_predict(image):
         word = categories[top_2[0][0]]
         predict_value = top_2[0][1]
         return word, predict_value
+
+def json_fill(video_time, word_prediction, predicition_value, video_name, json_path):
+    json_messge = {
+        'Description': {
+            'sysTime':               str(datetime.now().isoformat()) + 'Z',
+            'videoStartTime':        str(video_time.isoformat()) + 'Z',
+            'prediction(s)':         word_prediction,
+            'predictionConfidence':  predicition_value,
+            'videoName':             video_name
+        }
+    }
+    
+    logging.debug("Rewriting Json to File")
+    with open(json_file_path, 'w') as json_file:
+        json.dump(json_messge, json_file)
 
 # Function to Upload a specified path to an object to Azure Blob Storage
 def azure_upload_from_path(blob_container,blob_name,blob_object,blob_format):
@@ -222,6 +237,10 @@ def get_video():
     full_path =           "video-{0}-{1}.mp4".format("full", video_start_time.strftime("%Y%m%d%H%M%S"))
     full_video_path =     "{0}/{1}/{2}".format(base_dir, video_dir, full_path)
 
+    # Create a json file to a reference the given event
+    json_file_name = "{0}.json".format(full_path)
+    json_file_path = "{0}/{1}/{2}".format(base_dir,video_dir, json_file_name)
+
     if capture_video == True:
         # Save the video to a file path specified
         camera_device.split_recording(after_event_path)
@@ -232,11 +251,11 @@ def get_video():
         save_video(capture_rate, before_event_path, before_path_temp, before_mp4_path)
         save_video(capture_rate, after_event_path, after_path_temp, after_mp4_path)
 
-        # DELETE THIS LINE: Call a function here that automatically uploads to azure: Before
+        # Upload Before Videos to Azure Blob Storage
         before_video_folder = "{0}/{1}".format(video_container_name, 'beforevideo')
         azure_upload_from_path(before_video_folder, before_mp4, before_mp4_path, 'video/mp4')
 
-        # DELETE THIS LINE: Call a function here that automatically uploads to azure: After
+        # Upload After Videos to Azure Blob Storage
         after_video_folder = "{0}/{1}".format(video_container_name, 'aftervideo')
         azure_upload_from_path(after_video_folder, after_mp4, after_mp4_path, 'video/mp4')
 
@@ -245,9 +264,16 @@ def get_video():
         run_shell(full_video)
         logging.debug('Combining Full Video')
         
-        # DELETE THIS LINE: Call a function here that automatically uploads to azure
+        # Upload Video to Azure Blob Storage
         full_video_folder = "{0}/{1}".format(video_container_name, 'fullvideo')
         azure_upload_from_path(full_video_folder, full_path, full_video_path, 'video/mp4')
+
+        # Create json and fill it with information
+        json_fill(video_start_time, word, predict_value, full_path, json_file_path)
+
+        #Upload Json to Azure Blob Storge
+        azure_upload_from_path(json_container_name, json_file_name, json_file_path, 'application/json')
+        
         camera_device.stop_recording()
 
     # Used to Delete Directory but it needs a time delat
@@ -262,6 +288,7 @@ def main():
     global picture_container_name
     global video_container_name
     global model_container_name
+    global json_container_name
    
     #Define Varibles
     capture_rate = 30.0
@@ -281,9 +308,11 @@ def main():
     picture_container_name = 'edgeimages'
     video_container_name = 'edgevideos'
     model_container_name = 'edgemodels'
+    json_container_name = 'edgejson'
     block_blob_service.create_container(picture_container_name)
     block_blob_service.create_container(video_container_name)
     block_blob_service.create_container(model_container_name)
+    block_blob_service.create_container(json_container_name)
     
     # Make sure the neccessary 'pi3' folder is up to date from azure.
     azure_model_setup(model_container_name)
