@@ -46,13 +46,14 @@ def model_predict(image):
     input_shape = model.get_default_input_shape()
     input_data = emanager.prepare_image_for_model(image, input_shape.columns, input_shape.rows)
     prediction = model.predict(input_data)
-    top_5 = emanager.get_top_n(prediction, 5)
+    top_2 = emanager.get_top_n(prediction, 2)
     
-    if (len(top_5) < 1):
-        return None
+    if (len(top_2) < 1):
+        return None, None
     else:
-        word = categories[top_5[0][0]]
-        return word
+        word = categories[top_2[0][0]]
+        predict_value = top_2[0][1]
+        return word, predict_value
 
 # Function to Upload a specified path to an object to Azure Blob Storage
 def azure_upload_from_path(blob_container,blob_name,blob_object,blob_format):
@@ -153,42 +154,45 @@ def get_video():
 
             # Make Prediction with the first picture
             logging.debug('Prediction Captured')
-            word_predict = model_predict(image)
+            word, predict_value = model_predict(image)
+            
             # Give time here for model predictions
             camera_device.wait_recording(3)
             logging.debug('Prediction Returned')
+            my_now = datetime.now()
             
-            # See what we got back from the model
-            if word_predict is not None:
-                logging.debug('Event Registered')
-                capture_video=True
-                print('Prediction(s): {}'.format(word_predict))
-
-                # Format specifically for the Good Folder
-                good_image_folder = "{0}/goodimages".format(picture_container_name)
-                
-                # Send the Picture to the Good Images Folder on Azure
-                azure_upload_from_path(good_image_folder, image_name, image_path, 'image/jpeg')
-                
-                #Once it is uploaded, delete the image
-                os.remove(image_path)
-                break
-            else:
+            if word is None:
                 logging.debug('No Event Registered')
-                my_now = datetime.now()
-                capture_video=False
-               
+                capture_video = False
                 # Format specifically for the Good Folder
                 bad_image_folder = "{0}/badimages".format(picture_container_name)
                 # Send Picture to the Bad Images Folder on Azure that can be used to retrain
                 azure_upload_from_path(bad_image_folder, image_name, image_path, 'image/jpeg')
-
+            elif word is not None and predict_value < 0.5:
+                logging.debug('Prediction Value Too Low')
+                capture_video = False
+                # Format Specifically for the Good FOlder
+                bad_image_folder = "{0}/badimages".format(picture_container_name)
+                # Send Picture to the Bad Images Folder on Azure that can be used to retrain
+                azure_upload_from_path(bad_image_folder, image_name, image_path, 'image/jpeg')
+            else:
+                # See what we got back from the model
+                logging.debug('Event Registered')
+                capture_video=True
+                print('Prediction(s): {}'.format(word))
+                # Format specifically for the Good Folder
+                good_image_folder = "{0}/goodimages".format(picture_container_name)
+                # Send the Picture to the Good Images Folder on Azure
+                azure_upload_from_path(good_image_folder, image_name, image_path, 'image/jpeg')
+                # Once it is uploaded, delete the image
+                os.remove(image_path)
+                break
+            # If we don;t break by finidng the right predicition stay in the loop
             seconds_past = 0
             # Delete the image from the OS folder to save space
             os.remove(image_path)
 
     ## Create diretory to save the video that we get if we are told to capture video
-    #start_time = datetime.now()
     start_time = my_later
     base_dir = SCRIPT_DIR
     video_dir = "myvideos"
