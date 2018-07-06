@@ -275,7 +275,7 @@ def main():
     camera_device.framerate = capture_rate
 
     # Intialize Azure Properties
-    block_blob_service = BlockBlobService(account_name='mlonedge2018', account_key='Us6MOxp3edfXgP2YXxoiFlJPJMRVAfSTv8Gaaj6LIJXK30JL54aG7/woG6OWbS0g0kBuyEf7PfGkUDTULhq+jg==')
+    block_blob_service = BlockBlobService(account_name='************', account_key='***************************')
     
     # Create Neccesary Containers and Blobs if they don't exist already
     picture_container_name = 'edgeimages'
