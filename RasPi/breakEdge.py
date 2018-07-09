@@ -329,13 +329,13 @@ def main():
     block_blob_service.create_container(video_container_name)
     block_blob_service.create_container(model_container_name)
     block_blob_service.create_container(json_container_name)
-    
-    # Make sure the neccessary 'pi3' folder is up to date from azure.
-    azure_model_setup(model_container_name)
-    
+       
     # Constantly run the Edge.py Script
     while True:
         logging.debug('Starting Edge.py')
+        # Make sure the neccessary 'pi3' folder is up to date from azure.
+        azure_model_setup(model_container_name)
+        # Began running and stay running the entire project.
         get_video()
 
 if __name__ == '__main__':
