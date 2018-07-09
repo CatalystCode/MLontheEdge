@@ -116,12 +116,16 @@ def azure_model_setup(model_container_name):
         else:
             logging.debug("Checking model version. Looking for possible updates")
             time_now = datetime.now()
+            day_now = time_now.day
             hour_now = time_now.hour
 
-            for blob in azure_model:
-                blob_hour_change = blob.properties.last_modified.hour
 
-            if( abs(blob_hour_change-hour_now) >= 3):
+            for blob in azure_model:
+                blob_day_change = blob.properties.last_modified.day
+                blob_hour_change = blob.properties.last_modified.hour
+            
+            if( (abs(blob_hour_change-hour_now) >= 3)  or ( abs(blob_day_change-day_now) >=1 ) ):
+                logging.debug("Updating")
                 # Delete Current pi3 folder
                 shutil.rmtree(model_dir_path)
                 # Download Azure Version to the Raspberry pi
@@ -310,8 +314,12 @@ def main():
         sys.exit(1)
 
     # Intialize Azure Properties
-    block_blob_service = BlockBlobService(account_name='****************', account_key='***********************************')
-    
+    block_blob_service = BlockBlobService(account_name='****************', account_key='***************************************************')
+   
+    if block_blob_service is None:
+        logging.debug("No Azure Storage Account Connected")
+        sys.exit(1)
+
     # Create Neccesary Containers and Blobs if they don't exist already
     picture_container_name = 'edgeimages'
     video_container_name = 'edgevideos'
