@@ -5,7 +5,7 @@ import ellmanager as emanager
 import io
 import json
 import logging
-#import model
+import model
 import numpy as numpy
 import os
 import picamera
@@ -139,7 +139,7 @@ def get_video():
     # Define Variables
     capture_time = 30
     capture_rate = 30.0
-    preroll = 10
+    preroll = 5
     get_key = True
     capture_video = False
     camera_res = (256,256)
@@ -314,7 +314,7 @@ def main():
         sys.exit(1)
 
     # Intialize Azure Properties
-    block_blob_service = BlockBlobService(account_name='************', account_key='*************************************************')
+    block_blob_service = BlockBlobService(account_name='*************', account_key='****************************************')
    
     if block_blob_service is None:
         logging.debug("No Azure Storage Account Connected")
