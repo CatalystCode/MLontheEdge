@@ -1,15 +1,11 @@
 # MLontheEdge
-The overall purpose of this document is showcase example of Azure Machine Learning on IoT Edge Devices using Microsoft Embedded Learning Library (ELL)
+The overall purpose of this document is to showcase an example of Azure Machine Learning on IoT Edge Devices using Microsoft Embedded Learning Library (ELL)
 
 ## Table of Contents
 1. [Acquiring Equipments](https://github.com/CatalystCode/MLontheEdge#acquiring-equipments)
 2. [Windows Device Set Up](https://github.com/CatalystCode/MLontheEdge#window-device-set-up)
 * [ELL for Windows Devices](https://github.com/Microsoft/ELL/blob/master/INSTALL-Windows.md) 
 3. [Set Up for Raspberry Pi Devices](https://github.com/CatalystCode/MLontheEdge#set-up-for-raspberry-pi-devices)
-* Python 3.5.3
-* Change Hostname
-* Camera Set up
-* Enable SSH
 4. [Programming Tools](https://github.com/CatalystCode/MLontheEdge#programming-tools)
 5. [Download PreTrained Model](https://github.com/CatalystCode/MLontheEdge#download-models)
 6. [Running Application](https://github.com/CatalystCode/MLontheEdge#running-applications)
@@ -215,10 +211,41 @@ python3 -c "import cv2; print(cv2.__version__)"
 rm ~/opencv.zip
 rm -rf ~/opencv-3.3.0
 ```
-
-
 ## Download Models
 As of right now, the Microsoft ELL supports Neural Network Models that were trained with Microsoft Cognitive Toolkit(CNTK) or with Darknet. Follow the given tutorial for insights in how to download model with the ELL Library. [Importing Models.](https://microsoft.github.io/ELL/tutorials/Importing-models/)
+
+## From Host Device ELL to Raspberry Pi
+The next step is to now get a compressed model from the ELL Library from your laptop to your Raspberry Pi to be utilized. The directions below are modified based on a tutorial sample from the site [Microsft-Ell-Image-Classification.](https://microsoft.github.io/ELL/tutorials/Getting-started-with-image-classification-on-the-Raspberry-Pi/)
+
+1. Activate your Python enviroment on your host device
+```
+[Linux/macOS] source activate py36
+[Windows] activate py36
+```
+2. Create a new directory to be copied over to the Rasberry Pi. The directory should contain should compressed CTNK or Darknets model in ***model.ell*** form. It should also contain the text file for the model classification
+3. As before, run the wrap tool on your laptop or desktop computer, but this time specify the target platform as pi3. This tells the ELL compiler to generate machine code for the Raspberry Pi’s ARM Cortex A53 processor. This step needs to be performed in the directory to be copied to the Raspberry Pi.
+```bash
+python <ELL-root>/tools/wrap/wrap.py model.ell --language python --target pi3
+```
+4. To speed up the transfer of files to the Raspberry Pi, delete the model.ell file first before copying the folder. Now, there’s a pi3 directory that contains a CMake project that builds the Python wrapper and some helpful Python utilities. This directory should be inside a directory that also contains the model classification text.
+**Build Python Module:**
+1. For this step, you’ll be working with your the Raspberry Pi device. If your Pi device is accessible over the network, copy the directory using the Unix scp tool or the Windows WinSCP tool.
+2. Log in to your Raspberry Pi, find the directory you just copied from your computer, and build the python module that wraps the ELL model.
+```bash
+cd pi3
+mkdir build
+cd build
+cmake .. -DCMAKE_BUILD_TYPE=Release
+make
+cd ../..
+```
+3. You just created a Python module named model, which includes functions that report the model’s input and output dimensions and makes it possible to pass images to the model for classification.
+
+## Azure Storage
+**Azure Blob Storage:** The Raspberry Pi has a small storage capability. Therefore, it is important to save picture, videos, models, and project description on the Cloud. For this project, Azure Storage is being used. Steps on how to set up Azure Storage is linked here. [Azure Storage](https://docs.microsoft.com/en-us/azure/storage/common/storage-create-storage-account)
+***Note:*** Be sure to save and make note of your **STORAGE ACCOUNT NAME** and **STORAGE ACCOUNT KEYS.**
+
+
 
 ## Running Applications
 The steps below show how the given Azure ML on Edge Project is deployed
