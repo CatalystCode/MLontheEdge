@@ -243,8 +243,22 @@ cd ../..
 
 ## Azure Storage
 **Azure Blob Storage:** The Raspberry Pi has a small storage capability. Therefore, it is important to save picture, videos, models, and project description on the Cloud. For this project, Azure Storage is being used. Steps on how to set up Azure Storage is linked here. [Azure Storage](https://docs.microsoft.com/en-us/azure/storage/common/storage-create-storage-account)
-***Note:*** Be sure to save and make note of your **STORAGE ACCOUNT NAME** and **STORAGE ACCOUNT KEYS.**
+***Note:*** Be sure to save and make note of your **STORAGE ACCOUNT NAME** and **STORAGE ACCOUNT KEYS** They will be needed in the Edge.py script later.
+![azureblobs](https://user-images.githubusercontent.com/24871485/42781252-76f83098-88fa-11e8-8f5c-5f5eff0a5c04.PNG)
 
+**Pi3 Folder:** 
+
+The utilization of Azure Storage is essential for this application. Azure allows for automatic uploads and downloads of content file. As well, it is neccesarry for persitant updates to the current pi3 folder. 
+
+The first time, the application is ran with a correct Azure Credentials, blob containers are created for use with that given key. As well, the current version of the ***pi3*** folder is uploaded to its respective blob container. Constant checks are being made for changes and updates that occur every 3 hours. 
+
+**Important Note on the Pi3 Folder on Azure**
+After the project has been ran once and the given storage containers have been made, the user can now make changes to the given model and the pi3 folder. 
+1. Using the Azure Portal or Microsoft Azure Storage Explorer, locate the **edgemodels** blob container.
+2. This is where the compiled "pi3 folder" with its given model is stored. It is important that the pi3 folder is zipped before being ready to be uploaded to the given blob container.
+3. There can only be one item in this blob container and it most be titled ***zippedpi3*** for use on the Raspberry Pi.
+
+![edgmodels](https://user-images.githubusercontent.com/24871485/42782127-dcbcfb96-88fc-11e8-8a09-6576447ef46a.PNG)
 
 
 ## Running Applications
