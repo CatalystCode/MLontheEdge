@@ -1,0 +1,3 @@
+/home/pi/Desktop/Raspi/MLontheEdge/RasPi/pi3/build/CMakeFiles/rebuild_cache.dir
+/home/pi/Desktop/Raspi/MLontheEdge/RasPi/pi3/build/CMakeFiles/edit_cache.dir
+/home/pi/Desktop/Raspi/MLontheEdge/RasPi/pi3/build/CMakeFiles/_model.dir
