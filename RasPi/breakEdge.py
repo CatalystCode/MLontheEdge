@@ -187,7 +187,7 @@ def get_video():
                 bad_image_folder = "{0}/badimages".format(picture_container_name)
                 # Send Picture to the Bad Images Folder on Azure that can be used to retrain
                 azure_upload_from_path(bad_image_folder, image_name, image_path, 'image/jpeg')
-            elif word is not None and predict_value < 0.5:
+            elif word is not None and predict_value < 0.4:
                 logging.debug('Prediction Value Too Low')
                 capture_video = False
                 # Format Specifically for the Good FOlder
@@ -314,7 +314,7 @@ def main():
         sys.exit(1)
 
     # Intialize Azure Properties
-    block_blob_service = BlockBlobService(account_name='*************', account_key='****************************************')
+    block_blob_service = BlockBlobService(account_name='*************', account_key='*******************************')
    
     if block_blob_service is None:
         logging.debug("No Azure Storage Account Connected")
