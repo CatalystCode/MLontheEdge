@@ -228,6 +228,7 @@ The next step is to now get a compressed model from the ELL Library from your la
 python <ELL-root>/tools/wrap/wrap.py model.ell --language python --target pi3
 ```
 4. To speed up the transfer of files to the Raspberry Pi, delete the model.ell file first before copying the folder. Now, there’s a pi3 directory that contains a CMake project that builds the Python wrapper and some helpful Python utilities. This directory should be inside a directory that also contains the model classification text.
+
 **Build Python Module:**
 1. For this step, you’ll be working with your the Raspberry Pi device. If your Pi device is accessible over the network, copy the directory using the Unix scp tool or the Windows WinSCP tool.
 2. Log in to your Raspberry Pi, find the directory you just copied from your computer, and build the python module that wraps the ELL model.
@@ -242,17 +243,21 @@ cd ../..
 3. You just created a Python module named model, which includes functions that report the model’s input and output dimensions and makes it possible to pass images to the model for classification.
 
 ## Azure Storage
-**Azure Blob Storage:** The Raspberry Pi has a small storage capability. Therefore, it is important to save picture, videos, models, and project description on the Cloud. For this project, Azure Storage is being used. Steps on how to set up Azure Storage is linked here. [Azure Storage](https://docs.microsoft.com/en-us/azure/storage/common/storage-create-storage-account)
+**Azure Blob Storage:** 
+
+The Raspberry Pi has a small storage capability. Therefore, it is important to save picture, videos, models, and project description on the Cloud. For this project, Azure Storage is being used. Steps on how to set up Azure Storage is linked here. [Azure Storage](https://docs.microsoft.com/en-us/azure/storage/common/storage-create-storage-account)
+
 ***Note:*** Be sure to save and make note of your **STORAGE ACCOUNT NAME** and **STORAGE ACCOUNT KEYS** They will be needed in the Edge.py script later.
 ![azureblobs](https://user-images.githubusercontent.com/24871485/42781252-76f83098-88fa-11e8-8f5c-5f5eff0a5c04.PNG)
 
-**Pi3 Folder:** 
+**Pi3 Folder:**
 
 The utilization of Azure Storage is essential for this application. Azure allows for automatic uploads and downloads of content file. As well, it is neccesarry for persitant updates to the current pi3 folder. 
 
 The first time, the application is ran with a correct Azure Credentials, blob containers are created for use with that given key. As well, the current version of the ***pi3*** folder is uploaded to its respective blob container. Constant checks are being made for changes and updates that occur every 3 hours. 
 
-**Important Note on the Pi3 Folder on Azure**
+**Important Note on the Pi3 Folder on Azure:**
+
 After the project has been ran once and the given storage containers have been made, the user can now make changes to the given model and the pi3 folder. 
 1. Using the Azure Portal or Microsoft Azure Storage Explorer, locate the **edgemodels** blob container.
 2. This is where the compiled "pi3 folder" with its given model is stored. It is important that the pi3 folder is zipped before being ready to be uploaded to the given blob container.
@@ -276,11 +281,4 @@ cd MLontheEdge/Raspi/
 python3 Edge.py
 ```
 4. While the script is running, a camera preview window will be opened allow you to see what the picamera sees. The scripts takes a picture every 5 seconds and returns what the model thinks it sees in that picture.
-5. If the model and python script recognize an object, a video is captured of the 10 seconds before that moment and 15 seconds after the given moment and then saved in a new directory **myvideos.** 
-```bash
-cd myvideos\
-```
-6. The video is in .mp4 format and can be viewed with any MP4 video player or even from the command line:
-```bash
-omxplayer "filename"
-```
+5. If the model and python script recognize an object, a video is captured of the 10 seconds before that moment and 15 seconds after the given moment and then saved it to an **Azure Blob Storage** account.
