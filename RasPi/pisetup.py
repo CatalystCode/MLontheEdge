@@ -15,18 +15,12 @@ def azure_download_from_path(model_container_name, model_dir_path, compressed_mo
         zf.extractall(model_dir_path)
 
 def main():
-    print('Printing ScriptDir:')
-    print(SCRIPT_DIR)
-
     # Define Globals
     global block_blob_service
 
     # Define Locals
-    current_dir = os.getcwd()
-    print('Printing the current dir before changing')
-    print(current_dir)
-
     model_container_name = 'edgemodels'
+    current_dir = os.getcwd()
     model_dir = "pi3"
     build_dir = "build"
     model_dir_path = "{0}/{1}".format(SCRIPT_DIR, model_dir)
@@ -35,47 +29,33 @@ def main():
     compressed_model_dir_path ="{0}/{1}.zip".format(SCRIPT_DIR, compressed_model_name)
    
     # Set up Azure Credentials
-    block_blob_service = BlockBlobService(account_name='*************', account_key='*******************************')
+    block_blob_service = BlockBlobService(account_name='***************', account_key='***************************')
     if block_blob_service is None:
         logging.debug("No Azure Storage Account Connected")
         sys.exit(1)
     
     # Download Pi3 from Azure
-    print('About to download the pi3 folder from Azure')
-    azure_download_from_path(model_container_name, model_dir_path, compressed_model_dir_path, compressed_model_name)
-    print('I have downloaded the pi3 folder form Azure')
-
-    # Change into the Pi3 folder
-    print('About to change into the pi3 folder')
-    os.chdir(model_dir_path)
-    print('I have changed into the pi3 folder')
+    if not os.path.exists(model_dir_path):
+        azure_download_from_path(model_container_name, model_dir_path, compressed_model_dir_path, compressed_model_name)
+        # Check one more time to make sure that now the correct directory has been downloaded
+        if os.path.exists(model_dir_path):
+            os.chdir(model_dir_path)
 
     # Create a build Folder
-    print('Creating the Build Folder')
     while not os.path.exists(build_dir_path):
         os.makedirs(build_dir_path)
-    print('Created the Build Folder')
    
     # Change into the 'build' folder
-    print('About to change into the Build Folder')
     os.chdir(build_dir_path)
-    print('I have changed into the build folder')
     
     # Call the OS to run the 'cmake' command
-    print('About to make the cmake call in the build folder')
-    os.system('cmake')
-    print ('I have successfully ran the cmake command')
+    os.system('cmake .. -DCMAKE_BUILD_TYPE=Release')
 
     # Call the OS to run the essential 'make' command
-    print('About to run the make command on the OS')
     os.system('make')
-    print('We successfully ran make on the OS. WOW')
 
     # Change back into our current Scripts Directory
-    print('Changing back into the current directory')
     os.chdir(current_dir)
-    print('We have changed back into our working directory')
-    print('We are going back to our original code')
 
 if __name__ == '__main__':
     main()
