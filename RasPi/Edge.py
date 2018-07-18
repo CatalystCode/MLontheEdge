@@ -124,7 +124,7 @@ def azure_model_setup(model_container_name):
                 blob_day_change = blob.properties.last_modified.day
                 blob_hour_change = blob.properties.last_modified.hour
             
-            if( (abs(blob_hour_change-hour_now) >= 3)  or ( abs(blob_day_change-day_now) >=1 ) ):
+            if( (abs(blob_hour_change-hour_now) >= 6)  or ( abs(blob_day_change-day_now) >=1 ) ):
                 logging.debug("Updating")
                 # Delete Current pi3 folder
                 shutil.rmtree(model_dir_path)
@@ -187,7 +187,7 @@ def get_video():
                 bad_image_folder = "{0}/badimages".format(picture_container_name)
                 # Send Picture to the Bad Images Folder on Azure that can be used to retrain
                 azure_upload_from_path(bad_image_folder, image_name, image_path, 'image/jpeg')
-            elif word is not None and predict_value < 0.4:
+            elif word is not None and predict_value < 0.2:
                 logging.debug('Prediction Value Too Low')
                 capture_video = False
                 # Format Specifically for the Good FOlder
@@ -314,7 +314,7 @@ def main():
         sys.exit(1)
 
     # Intialize Azure Properties
-    block_blob_service = BlockBlobService(account_name='*************', account_key='*******************************')
+    block_blob_service = BlockBlobService(account_name='***********', account_key='**************************************************=')
    
     if block_blob_service is None:
         logging.debug("No Azure Storage Account Connected")
