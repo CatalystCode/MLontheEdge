@@ -70,10 +70,6 @@ def json_fill(video_time, word_prediction, predicition_value, video_name, json_p
     with open(json_path, 'w') as json_file:
         json.dump(json_messge, json_file)
 
-# Function to Upload a specified path to an object to Azure Blob Storage
-def azure_upload_from_path(blob_container,blob_name,blob_object,blob_format):
-    block_blob_service.create_blob_from_path(blob_container, blob_name,blob_object, content_settings=ContentSettings(content_type=blob_format))
-
 def azure_download_from_path(model_container_name, model_dir_path, compressed_model_dir_path, compressed_model_name):
     #Download Azure Version to the Raspberry pi
         block_blob_service.get_blob_to_path(model_container_name, compressed_model_name, compressed_model_dir_path)
@@ -81,59 +77,49 @@ def azure_download_from_path(model_container_name, model_dir_path, compressed_mo
         zf = zipfile.ZipFile(compressed_model_dir_path)
         zf.extractall(model_dir_path)
 
-def azure_model_setup(model_container_name):
-    # DELETE THIS LINE: Call a function here that automatically checks the model blob and downlods from azure
-    model_dir = "pi3"
-    model_dir_path = "{0}/{1}".format(SCRIPT_DIR, model_dir)
-    compressed_model_name = "zipped{0}".format(model_dir)
-    compressed_model_dir_path ="{0}/{1}.zip".format(SCRIPT_DIR, compressed_model_name)
-   
-    # This Needs to be More efficient 
-    # There should really only be one model in the edge model blob
-    model_count = 0
-    azure_model = block_blob_service.list_blobs(model_container_name)
-    for item in azure_model:
-        model_count+=1
+def azure_model_update(update_json_path): 
+    print('We are in the model_update function')
+    
+    # List the Models in the blob. There should only be one named zippedpi3
+    model_blob_list = block_blob_service.list_blobs(model_container_name)
+    for blob in model_blob_list:
+        print(blob.name)
+        if (blob.name == 'zippedpi3'):
+            last_blob_update = blob.properties.last_modified
+            print('Printing the date in UTC time format')
+            print(last_blob_update)
+        # Leave the loop once we found what we want
+        break;
+    
+    # If we don't already got the json just go ahead and create a new one
+    if not os.path.exists(update_json_path):
+        dict = {'lastupdate': last_blob_update}
+        holder = json.dump(dict)
+        f.open(update_json_path, "w")
+        f.write(j)
+        f.close()
 
-    if (model_count == 0):
-        if not os.path.exists(model_dir_path):
-            logging.debug("There is no pi3 folder on this device or on the Azure Blob Storage Account. GOODBYE!")
-            sys.exit(1)
-        else:
-            logging.debug("No 'zippedpi3' folder found on Azure. About 20 seconds to compress and upload located pi3 to Azure")
-            shutil.make_archive(compressed_model_name,'zip',model_dir_path)
-            logging.debug("We finished Compressing this package")
-            azure_upload_from_path(model_container_name, compressed_model_name, compressed_model_dir_path, 'application/zip')
-            os.remove(compressed_model_dir_path)
-    else:
-        if not os.path.exists(model_dir_path):
-            logging.debug("No 'pi3' folder found on device. Downloading and uncompresing folder from Azure Blob Storage")
-            # Download the Zipped Version from Azure Blob Storage
-            azure_download_from_path(model_container_name, model_dir_path,compressed_model_dir_path,compressed_model_name)
-            logging.debug("'pi3' Download Completed")
-            # Remove all remaining zip files in the folder
-            os.remove(compressed_model_dir_path)
-        else:
-            logging.debug("Checking model version. Looking for possible updates")
-            time_now = datetime.now()
-            day_now = time_now.day
-            hour_now = time_now.hour
+    # Now that we need know we have it, we need to parse it and decide if we need to update or not
+    with open(update_json_path) as f:
+        json_data = json.load(f)
+    last_model_update = json_data["lastupdate"]
 
 
-            for blob in azure_model:
-                blob_day_change = blob.properties.last_modified.day
-                blob_hour_change = blob.properties.last_modified.hour
-            
-            if( (abs(blob_hour_change-hour_now) >= 3)  or ( abs(blob_day_change-day_now) >=1 ) ):
-                logging.debug("Updating")
-                # Delete Current pi3 folder
-                shutil.rmtree(model_dir_path)
-                # Download Azure Version to the Raspberry pi
-                azure_download_from_path(model_container_name, model_dir_path, compressed_model_dir_path, compressed_model_name)
-                # Upload it back to Azure to get a new modification time
-                azure_upload_from_path(model_container_name, compressed_model_name, compressed_model_dir_path, 'application/zip')
-                # Delete the unneccesary zip file
-                os.remove(compressed_model_dir_path)
+    # If the times are not equal and there has been a change somewhere Update
+    if (last_model_update != last_blob_update):
+        # Check to make sure that we have the pisetup.py script
+        print ('They were not the same so I will be performing an update now')
+        os.system('python3 pisetup.py')
+        
+        # Change the json file to represent the new modified time
+        json_data["lastupdate"] = last_blob_update
+        json.dump(json_data, f)
+
+
+
+# Function to Upload a specified path to an object to Azure Blob Storage
+def azure_upload_from_path(blob_container,blob_name,blob_object,blob_format):
+    block_blob_service.create_blob_from_path(blob_container, blob_name,blob_object, content_settings=ContentSettings(content_type=blob_format))
 
 def get_video():
     # Define Variables
@@ -329,12 +315,17 @@ def main():
     block_blob_service.create_container(video_container_name)
     block_blob_service.create_container(model_container_name)
     block_blob_service.create_container(json_container_name)
-       
+            
+    # Intialize the updates Json File
+    update_json_path = "{0}/{1}.json".format(SCRIPT_DIR, 'updatehistory')
+           
     # Constantly run the Edge.py Script
     while True:
         logging.debug('Starting Edge.py')
-        # Make sure the neccessary 'pi3' folder is up to date from azure.
-        azure_model_setup(model_container_name)
+
+        # Check and Run Model Updates
+        azure_model_update(update_json_path)
+            
         # Began running and stay running the entire project.
         get_video()
 

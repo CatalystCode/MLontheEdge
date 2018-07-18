@@ -1,7 +1,15 @@
 #!/usr/bin/env python3
 
+# Description:
+# 1. Delete the current version of pi3: Check 
+# 2. Download the latest version froma Azure: Check
+# 3. Run Cmake: Check
+# 4. Run Make: Check
+# 5. Go back to the Edge.py script
+
 import os
 import zipfile
+import shutil
 import logging
 from azure.storage.blob import BlockBlobService, ContentSettings, PublicAccess
 
@@ -34,12 +42,16 @@ def main():
         logging.debug("No Azure Storage Account Connected")
         sys.exit(1)
     
+    # Delete the current version on the Raspberry Pi if there is one
+    if os.path.exists(model_dir_path):
+        shutil.rmtree(model_dir_path)
+
     # Download Pi3 from Azure
-    if not os.path.exists(model_dir_path):
-        azure_download_from_path(model_container_name, model_dir_path, compressed_model_dir_path, compressed_model_name)
-        # Check one more time to make sure that now the correct directory has been downloaded
-        if os.path.exists(model_dir_path):
-            os.chdir(model_dir_path)
+    azure_download_from_path(model_container_name, model_dir_path, compressed_model_dir_path, compressed_model_name)
+    
+    # Azure should catch this issue but still check one more time to make sure that the correct directory has been downloaded
+    if os.path.exists(model_dir_path):
+        os.chdir(model_dir_path)
 
     # Create a build Folder
     while not os.path.exists(build_dir_path):
@@ -54,7 +66,7 @@ def main():
     # Call the OS to run the essential 'make' command
     os.system('make')
 
-    # Change back into our current Scripts Directory
+    # Change back into our current scripts Directory
     os.chdir(current_dir)
 
 if __name__ == '__main__':
