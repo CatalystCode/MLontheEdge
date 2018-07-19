@@ -21,6 +21,7 @@ def azure_download_from_path(model_container_name, model_dir_path, compressed_mo
         os.makedirs(model_dir_path)
         zf = zipfile.ZipFile(compressed_model_dir_path)
         zf.extractall(model_dir_path)
+        os.remove(compressed_model_dir_path)
 
 def main():
     # Define Globals
@@ -37,7 +38,7 @@ def main():
     compressed_model_dir_path ="{0}/{1}.zip".format(SCRIPT_DIR, compressed_model_name)
    
     # Set up Azure Credentials
-    block_blob_service = BlockBlobService(account_name='***************', account_key='***************************')
+    block_blob_service = BlockBlobService(account_name='**************', account_key='*******************************')
     if block_blob_service is None:
         logging.debug("No Azure Storage Account Connected")
         sys.exit(1)

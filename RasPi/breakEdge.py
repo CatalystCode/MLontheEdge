@@ -83,27 +83,26 @@ def azure_model_update(update_json_path):
     # List the Models in the blob. There should only be one named zippedpi3
     model_blob_list = block_blob_service.list_blobs(model_container_name)
     for blob in model_blob_list:
-        print(blob.name)
+        # Find the given one if there are more than one models
         if (blob.name == 'zippedpi3'):
-            last_blob_update = blob.properties.last_modified
-            print('Printing the date in UTC time format')
-            print(last_blob_update)
-        # Leave the loop once we found what we want
-        break;
+            # Get the Date of the most recent update
+            last_blob_update = str(blob.properties.last_modified)
+            # Leave the loop once we found what we want
+            break;
     
     # If we don't already got the json just go ahead and create a new one
-    if not os.path.exists(update_json_path):
-        dict = {'lastupdate': last_blob_update}
-        holder = json.dump(dict)
-        f.open(update_json_path, "w")
-        f.write(j)
-        f.close()
+    if not os.path.exists(update_json_path) or os.stat(update_json_path).st_size == 0:
+        # Since we did not have the json of infomation about it, go ahead and update to be safe
+        os.system('python3 pisetup.py')
+        holder = {"lastupdate": last_blob_update}
+        # After updating, make sure we now update the json
+        with open(update_json_path, "w+") as f:
+            f.write(json.dumps(holder))
 
     # Now that we need know we have it, we need to parse it and decide if we need to update or not
-    with open(update_json_path) as f:
-        json_data = json.load(f)
-    last_model_update = json_data["lastupdate"]
-
+    with open(update_json_path, "r") as j:
+        json_data = json.load(j)
+        last_model_update = json_data["lastupdate"]
 
     # If the times are not equal and there has been a change somewhere Update
     if (last_model_update != last_blob_update):
@@ -113,8 +112,8 @@ def azure_model_update(update_json_path):
         
         # Change the json file to represent the new modified time
         json_data["lastupdate"] = last_blob_update
-        json.dump(json_data, f)
-
+        with open (update_json_path, "w+") as j:
+            json.dump(json_data, j)
 
 
 # Function to Upload a specified path to an object to Azure Blob Storage
@@ -300,7 +299,7 @@ def main():
         sys.exit(1)
 
     # Intialize Azure Properties
-    block_blob_service = BlockBlobService(account_name='**************', account_key='***************************')
+    block_blob_service = BlockBlobService(account_name='***********', account_key='********************************')
    
     if block_blob_service is None:
         logging.debug("No Azure Storage Account Connected")
