@@ -33,7 +33,11 @@ def main():
     block_blob_service.create_container(model_container_name)
 
     # Compress the current model file on the computer
-    shutil.make_archive(compressed_model_name, 'zip', model_dir_path)
+    if os.path.exists(model_dir_path):
+        shutil.make_archive(compressed_model_name, 'zip', model_dir_path)
+    else:
+        print("There is no model file in this directory")
+        sys.exit(1)
 
     # Upload the Compressed file to Azure
     azure_upload_from_path(model_container_name, compressed_model_name, compressed_model_dir_path, 'application/zip')
