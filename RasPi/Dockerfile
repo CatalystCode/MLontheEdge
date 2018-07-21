@@ -22,7 +22,7 @@ RUN apt-get install -y \
 	libatlas-base-dev gfortran \
 	python3-dev \
 	
-CMD ["python3", "-m", "install", "jinja2"]
+CMD ["python3", "-m", "pip", "install", "jinja2"]
 
 CMD ["python3", "-m", "pip", "install", "numpy"]
 
