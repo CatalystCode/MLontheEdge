@@ -2,16 +2,12 @@ FROM python:3
 
 ENTRYPOINT []
 
-RUN modprobe bcm2835-v4l2
-
-RUN apt-get update 
-
-RUN apt-get install -y \
+RUN apt-get update && apt-get install -y \
 	cmake \
 	libopenblas-dev \
-	curl \
+	curl
 
-RUN apt-get upgrade -y
+RUN apt-get update && apt-get upgrade -y
 
 RUN apt-get install -y \
 	build-essential cmake pkg-config \
@@ -20,7 +16,7 @@ RUN apt-get install -y \
 	libxvidcore-dev libx264-dev \
 	libgtk2.0-dev libgtk-3-dev \
 	libatlas-base-dev gfortran \
-	python3-dev \
+	python3-dev 
 	
 CMD ["python3", "-m", "pip", "install", "jinja2"]
 
