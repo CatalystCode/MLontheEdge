@@ -11,7 +11,7 @@ RUN apt-get update && apt-get upgrade -y
 
 RUN apt-get install -y \
 	build-essential cmake pkg-config \
-	libjpeg-dev libtiff5-dev libjasper-dev libpng12-dev libdc1394-22-dev \
+	#libjpeg-dev libtiff5-dev libjasper-dev libpng12-dev libdc1394-22-dev \
 	libavcodec-dev libavformat-dev libswscale-dev libv4l-dev \
 	libxvidcore-dev libx264-dev \
 	libgtk2.0-dev libgtk-3-dev \
