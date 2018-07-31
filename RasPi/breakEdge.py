@@ -30,32 +30,42 @@ def run_shell(cmd):
     logging.debug('Running shell command')
     return str(output.rstrip().decode())
 
-def save_video(capture_rate,input_path,output_path,rename_path):
+def save_video(capture_rate, input_path, output_path, rename_path):
     # Convert each indivudul .h264 to mp4 
     mp4_box = "MP4Box -fps {0} -quiet -add {1} {2}".format(capture_rate, input_path, output_path)
+    # Call the OS to perform the compressing
     run_shell(mp4_box)
+    # Remove the .h264 file to save space on the RPI
     os.remove(input_path)
+    # Rename for Better Convention Understanding
     os.rename(output_path, rename_path)
     logging.debug('Video Saved')
 
-
 def model_predict(image):
+    # Open the required categories.txt file used for identify the labels for recognized images
     with open("categories.txt", "r") as cat_file:
         categories = cat_file.read().splitlines()
 
+    # Determine the right size and shape that the model wants
     input_shape = model.get_default_input_shape()
+    # Get the given image ready for use with the model
     input_data = emanager.prepare_image_for_model(image, input_shape.columns, input_shape.rows)
+    # Make the Model Prediction
     prediction = model.predict(input_data)
+    # Return the max top 2 predictions if they exits
     top_2 = emanager.get_top_n(prediction, 2)
-    
+    # Make a decision on what to do based on the return prediction values
     if (len(top_2) < 1):
+        # If nothing, return nothing
         return None, None
     else:
+        # Something was recongized, give the name based on the categories file and give the value
         word = categories[top_2[0][0]]
         predict_value = top_2[0][1]
         return word, predict_value
 
 def json_fill(video_time, word_prediction, predicition_value, video_name, json_path):
+    # Template for description of the image and video taken
     json_messge = {
         'Description': {
             'sysTime':               str(datetime.now().isoformat()) + 'Z',
@@ -65,21 +75,22 @@ def json_fill(video_time, word_prediction, predicition_value, video_name, json_p
             'videoName':             video_name
         }
     }
-    
     logging.debug("Rewriting Json to File")
+    # Write Json Message to file
     with open(json_path, 'w') as json_file:
         json.dump(json_messge, json_file)
 
 def azure_download_from_path(model_container_name, model_dir_path, compressed_model_dir_path, compressed_model_name):
-    #Download Azure Version to the Raspberry pi
-        block_blob_service.get_blob_to_path(model_container_name, compressed_model_name, compressed_model_dir_path)
-        os.makedirs(model_dir_path)
-        zf = zipfile.ZipFile(compressed_model_dir_path)
-        zf.extractall(model_dir_path)
+    # Download Azure Version to the Raspberry pi
+    block_blob_service.get_blob_to_path(model_container_name, compressed_model_name, compressed_model_dir_path)
+    # Create a directory to save the new model into
+    os.makedirs(model_dir_path)
+    # File comes in a compressed format
+    zf = zipfile.ZipFile(compressed_model_dir_path)
+    # Extract the compressed model into a file that can be used.
+    zf.extractall(model_dir_path)
 
 def azure_model_update(update_json_path): 
-    print('We are in the model_update function')
-    
     # List the Models in the blob. There should only be one named zippedpi3
     model_blob_list = block_blob_service.list_blobs(model_container_name)
     for blob in model_blob_list:
@@ -94,8 +105,9 @@ def azure_model_update(update_json_path):
     if not os.path.exists(update_json_path) or os.stat(update_json_path).st_size == 0:
         # Since we did not have the json of infomation about it, go ahead and update to be safe
         os.system('python3 pisetup.py')
+        # Save the timestamp of the last time things were updated
         holder = {"lastupdate": last_blob_update}
-        # After updating, make sure we now update the json
+        # After updating, make sure we know update the json
         with open(update_json_path, "w+") as f:
             f.write(json.dumps(holder))
 
@@ -152,7 +164,6 @@ def get_video():
             # Take Picture for Azure
             image_name = "image-{0}.jpg".format(my_later.strftime("%Y%m%d%H%M%S"))
             image_path = "{0}/{1}".format(SCRIPT_DIR, image_name)
-            print(image_path)
             camera_device.capture(image_path)
             camera_device.wait_recording(1)
 
