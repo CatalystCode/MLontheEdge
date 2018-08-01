@@ -27,29 +27,28 @@ RUN apt-get update && apt-get install -y --no-install-recommends\
     	# Open CV Requirement
     	python3-numpy 
 
+# Update and Upgrade
 RUN apt-get update && apt-get upgrade -y
 
+# Install final neccesarry opencv packages
 RUN apt-get install -y libgtk2.0-dev libgtk-3-dev
-
 RUN pip3 install jinja2 \
 	ipython
 
+# Begin building opencv in a Docker Container
 WORKDIR /home
 RUN mkdir opencvbuilder
 RUN wget -O opencv.zip https://github.com/Itseez/opencv/archive/3.3.0.zip
 RUN unzip opencv.zip
 
 WORKDIR /home/opencv-3.3.0
-#RUN cd opencv-3.3.0
 RUN wget -O opencv_contrib.zip https://github.com/Itseez/opencv_contrib/archive/3.3.0.zip 
 RUN unzip opencv_contrib.zip
 
 WORKDIR /home/opencv-3.3.0
-#RUN cd opencv-3.3.0
 RUN mkdir build
-WORKDIR /home/opencv-3.3.0/build
-#RUN cd build
 
+WORKDIR /home/opencv-3.3.0/build
 RUN cmake -D CMAKE_BUILD_TYPE=RELEASE \
   -D CMAKE_INSTALL_PREFIX=/usr/local \
   -D INSTALL_PYTHON_EXAMPLES=ON \
