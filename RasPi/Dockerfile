@@ -31,24 +31,27 @@ RUN apt-get update && apt-get install -y --no-install-recommends\
 RUN apt-get update && apt-get upgrade -y
 
 # Install final neccesarry opencv packages
-RUN apt-get install -y libgtk2.0-dev libgtk-3-dev
+RUN apt-get install -y libgtk2.0-dev libgtk-3-dev \
+	python3-picamera
+		
 RUN pip3 install jinja2 \
 	ipython
+# Install Azure Storage Dependencies
 
 # Begin building opencv in a Docker Container
-WORKDIR /home
+WORKDIR /home/pi
 RUN mkdir opencvbuilder
 RUN wget -O opencv.zip https://github.com/Itseez/opencv/archive/3.3.0.zip
 RUN unzip opencv.zip
 
-WORKDIR /home/opencv-3.3.0
+WORKDIR /home/pi/opencv-3.3.0
 RUN wget -O opencv_contrib.zip https://github.com/Itseez/opencv_contrib/archive/3.3.0.zip 
 RUN unzip opencv_contrib.zip
 
-WORKDIR /home/opencv-3.3.0
+WORKDIR /home/pi/opencv-3.3.0
 RUN mkdir build
 
-WORKDIR /home/opencv-3.3.0/build
+WORKDIR /home/pi/opencv-3.3.0/build
 RUN cmake -D CMAKE_BUILD_TYPE=RELEASE \
   -D CMAKE_INSTALL_PREFIX=/usr/local \
   -D INSTALL_PYTHON_EXAMPLES=ON \
@@ -66,13 +69,17 @@ RUN cmake -D CMAKE_BUILD_TYPE=RELEASE \
   -D PYTHON3_EXECUTABLE=/usr/bin/python3 \
   -D PYTHON3_INCLUDE_DIR=/usr/include/python3.5 \
   -D PYTHON3_LIBRARY=/usr/lib/arm-linux-gnueabihf/libpython3.5m.so \
-  -D PYTHON3_NUMPY_INCLUDE_DIRS=/home/pi/.local/lib/python3.5/site-packages/numpy/core/include \
-  -D PYTHON3_PACKAGES_PATH=/home/pi/.local/lib/python3.5/site-packages \
+  -D PYTHON3_NUMPY_INCLUDE_DIRS=/home/pi/local/lib/python3.5/site-packages/numpy/core/include \
+  -D PYTHON3_PACKAGES_PATH=/home/pi/local/lib/python3.5/site-packages \
   ..
 
 RUN make
 
 RUN make install
+# Need to export path to the bashrc
+
+# Begin Running the Scripts
+
 
 # Install OpenCV
 #COPY ./build_install_opencv.sh /home/build_install_opencv.sh
