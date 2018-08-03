@@ -68,8 +68,8 @@ RUN cmake -D CMAKE_BUILD_TYPE=RELEASE \
   -D PYTHON3_EXECUTABLE=/usr/bin/python3 \
   -D PYTHON3_INCLUDE_DIR=/usr/include/python3.5 \
   -D PYTHON3_LIBRARY=/usr/lib/arm-linux-gnueabihf/libpython3.5m.so \
-  -D PYTHON3_NUMPY_INCLUDE_DIRS=/home/pi/local/lib/python3.5/site-packages/numpy/core/include \
-  -D PYTHON3_PACKAGES_PATH=/home/pi/local/lib/python3.5/site-packages \
+  -D PYTHON3_NUMPY_INCLUDE_DIRS=usr/local/lib/python3.5/site-packages/numpy/core/include \
+  -D PYTHON3_PACKAGES_PATH=/usr/local/lib/python3.5/site-packages \
   ..
 
 RUN make
@@ -77,15 +77,22 @@ RUN make
 RUN make install
 
 # Need to export path to the bashrc
-RUN echo 'export PYTHONPATH=$PYTHONPATH:/home/pi/local/lib/python3.5/site-packages' >> ~/.bashrc
+RUN echo 'export PYTHONPATH=$PYTHONPATH:/usr/local/lib/python3.5/site-packages' >> ~/.bashrc
 
 # Run the pip install of the Azure IoTHub Clients
 WORKDIR /home/pi
-RUN pip3 install azure-iothub-device-client \
-		azure-iothub-service-client \
-		azure-storage
+RUN pip3 install azure-iothub-device-client 
+RUN pip3 install azure-iothub-service-client 
+RUN pip3 install azure-storage
 
 COPY ./test.py /home/pi
 COPY ./run.sh /home/pi/run.sh
 
+# Delete the downloaded opencv helpers
+RUN rm -rf opencvbuilder
+RUN rm -rf opencv.zip
+RUN rm -rf opencv-3.3.0
+
+# Run the given shell script when prompted
 CMD ["/bin/bash", "-c", "chmod +x run.sh && ./run.sh" ]
+
