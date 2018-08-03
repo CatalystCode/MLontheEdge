@@ -36,7 +36,6 @@ RUN apt-get install -y libgtk2.0-dev libgtk-3-dev \
 		
 RUN pip3 install jinja2 \
 	ipython
-# Install Azure Storage Dependencies
 
 # Begin building opencv in a Docker Container
 WORKDIR /home/pi
@@ -76,15 +75,29 @@ RUN cmake -D CMAKE_BUILD_TYPE=RELEASE \
 RUN make
 
 RUN make install
-# Need to export path to the bashrc
 
-# Begin Running the Scripts
+# Need to export path to the bashrc
+RUN echo 'export PYTHONPATH=$PYTHONPATH:/home/pi/local/lib/python3.5/site-packages' >> ~/.bashrc
+
+# Add the Azure Storage Dependacies for Python3 (Could be an easier download from pip3)
+COPY /azurestoragepack/azure_iothub_device_client-1.4.0-py3-none-linux_armv7l.whl /home/pi/azure_iothub_device_client-1.4.0-py3-none-linux_armv7l.whl 
+COPY /azurestoragepack/azure_iothub_service_client-1.4.0-py3-none-linux_armv7l.whl /home/pi/azure_iothub_service_client-1.4.0-py3-none-linux_armv7l.whl 
+
+# Run the pip install of the Azure IoTHub Clients
+WORKDIR /home/pi
+RUN pip3 install azure_iothub_device_client-1.4.0-py3-none-linux_armv7l.whl \
+	azure_iothub_service_client-1.4.0-py3-none-linux_armv7l.whl
+
+COPY ./test.py /home/pi
+COPY ./run.sh /home/pi/run.sh
+
+CMD ["/bin/bash", "-c", "chmod +x run.sh && ./run.sh" ]
+
+# Run 
 
 
 # Install OpenCV
 #COPY ./build_install_opencv.sh /home/build_install_opencv.sh
 #RUN chmod ugo+x /home/build_install_opencv.sh
-
-#RUN ls /root
 
 #CMD /home/build_install_opencv ; sleep infinity
