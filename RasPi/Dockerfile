@@ -89,11 +89,3 @@ COPY ./test.py /home/pi
 COPY ./run.sh /home/pi/run.sh
 
 CMD ["/bin/bash", "-c", "chmod +x run.sh && ./run.sh" ]
-# Run 
-
-
-# Install OpenCV
-#COPY ./build_install_opencv.sh /home/build_install_opencv.sh
-#RUN chmod ugo+x /home/build_install_opencv.sh
-
-#CMD /home/build_install_opencv ; sleep infinity
