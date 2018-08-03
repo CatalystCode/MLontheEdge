@@ -79,20 +79,16 @@ RUN make install
 # Need to export path to the bashrc
 RUN echo 'export PYTHONPATH=$PYTHONPATH:/home/pi/local/lib/python3.5/site-packages' >> ~/.bashrc
 
-# Add the Azure Storage Dependacies for Python3 (Could be an easier download from pip3)
-COPY /azurestoragepack/azure_iothub_device_client-1.4.0-py3-none-linux_armv7l.whl /home/pi/azure_iothub_device_client-1.4.0-py3-none-linux_armv7l.whl 
-COPY /azurestoragepack/azure_iothub_service_client-1.4.0-py3-none-linux_armv7l.whl /home/pi/azure_iothub_service_client-1.4.0-py3-none-linux_armv7l.whl 
-
 # Run the pip install of the Azure IoTHub Clients
 WORKDIR /home/pi
-RUN pip3 install azure_iothub_device_client-1.4.0-py3-none-linux_armv7l.whl \
-	azure_iothub_service_client-1.4.0-py3-none-linux_armv7l.whl
+RUN pip3 install azure-iothub-device-client \
+		azure-iothub-service-client \
+		azure-storage
 
 COPY ./test.py /home/pi
 COPY ./run.sh /home/pi/run.sh
 
 CMD ["/bin/bash", "-c", "chmod +x run.sh && ./run.sh" ]
-
 # Run 
 
 

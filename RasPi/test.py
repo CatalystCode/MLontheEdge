@@ -16,13 +16,13 @@ import time
 import tty
 import zipfile
 from datetime import datetime, timedelta
-#from azure.storage.blob import BlockBlobService, ContentSettings, PublicAccess
+from azure.storage.blob import BlockBlobService, ContentSettings, PublicAccess
 # Import the right folder and file
 #import ellmanager as emanager
 #import model
 
 def main():
-    while True:
+    for i in range(10):    
         print('This is a test that worked')
 
 
