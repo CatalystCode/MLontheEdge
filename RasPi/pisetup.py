@@ -48,6 +48,7 @@ def main():
         shutil.rmtree(model_dir_path)
 
     # Download Pi3 from Azure
+    logging.debug('Downloading from Azure Blob Storage')
     azure_download_from_path(model_container_name, model_dir_path, compressed_model_dir_path, compressed_model_name)
     
     # Azure should catch this issue but still check one more time to make sure that the correct directory has been downloaded
@@ -55,11 +56,14 @@ def main():
         os.chdir(model_dir_path)
 
     # Create a build Folder
+    logging.debug('Creating Build Folder')
     while not os.path.exists(build_dir_path):
         os.makedirs(build_dir_path)
    
     # Change into the 'build' folder
     os.chdir(build_dir_path)
+    
+    logging.debug('Running make on Pi3 Building Folder')
     
     # Call the OS to run the 'cmake' command
     os.system('cmake .. -DCMAKE_BUILD_TYPE=Release')
