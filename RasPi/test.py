@@ -25,6 +25,14 @@ def main():
     for i in range(10):    
         print('This is a test that worked')
 
+    print('Camera is about to start')
+    camera = picamera.PiCamera()
+    camera.resolution = (640, 480)
+    camera.start_recording('testvideo.h264')
+    camera.wait_recording(10)
+    camera.stop_recording()
+    print('Camera Worked and stoped recording')
+
 
 if __name__ == '__main__':
     main()
