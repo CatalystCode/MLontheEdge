@@ -85,14 +85,35 @@ RUN pip3 install azure-iothub-device-client
 RUN pip3 install azure-iothub-service-client 
 RUN pip3 install azure-storage
 
-COPY ./test.py /home/pi
-COPY ./run.sh /home/pi/run.sh
-
 # Delete the downloaded opencv helpers
 RUN rm -rf opencvbuilder
 RUN rm -rf opencv.zip
 RUN rm -rf opencv-3.3.0
 
+# Update and Upgrade
+RUN apt-get update && apt-get upgrade -y
+
+# Get the AMLonEdge Project in the Docker Container
+RUN mkdir amlonedge
+WORKDIR /home/pi/amlonedge
+COPY ./test.py /home/pi/amlonedge/test.py
+COPY ./run.sh /home/pi/amlonedge/run.sh
+COPY ./categories.txt /home/pi/amlonedge/categories.txt
+COPY ./Edge.py /home/pi/amlonedge/Edge.py
+COPY ./ellmanager.py /home/pi/amlonedge/ellmanager.py
+COPY ./Host.py /home/pi/amlonedge/Host.py
+COPY ./pisetup.py /home/pi/amlonedge/pisetup.py
+COPY ./updatehistory.json /home/pi/amlonedge/updatehistory.json
+
+# Add pi3 - Make pi3 directory
+RUN mkdir pi3
+WORKDIR /home/pi/amlonedge/pi3
+COPY ./pi3/ /home/pi/amlonedge/pi3/
+
+# Go back into the running directory
+WORKDIR /home/pi/amlonedge
 # Run the given shell script when prompted
+RUN chmod +x Edge.py
+RUN chmod +x pisetup.py
 CMD ["/bin/bash", "-c", "chmod +x run.sh && ./run.sh" ]
 
