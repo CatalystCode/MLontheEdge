@@ -120,5 +120,6 @@ WORKDIR /home/pi/amlonedge
 # Run the given shell script when prompted
 RUN chmod +x Edge.py
 RUN chmod +x pisetup.py
+
 CMD ["/bin/bash", "-c", "chmod +x run.sh && ./run.sh" ]
 
