@@ -90,6 +90,10 @@ RUN rm -rf opencvbuilder
 RUN rm -rf opencv.zip
 RUN rm -rf opencv-3.3.0
 
+# Pi Camera Compatilibity
+RUN usermod -a -G video root
+CMD modprobe bcm2835-v4l2
+
 # Update and Upgrade
 RUN apt-get update && apt-get upgrade -y
 
@@ -112,6 +116,7 @@ COPY ./pi3/ /home/pi/amlonedge/pi3/
 
 # Go back into the running directory
 WORKDIR /home/pi/amlonedge
+
 # Run the given shell script when prompted
 RUN chmod +x Edge.py
 RUN chmod +x pisetup.py
