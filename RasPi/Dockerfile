@@ -32,7 +32,8 @@ RUN apt-get update && apt-get upgrade -y
 
 # Install final neccesarry opencv packages
 RUN apt-get install -y libgtk2.0-dev libgtk-3-dev \
-	python3-picamera
+	python3-picamera \
+	gpac
 		
 RUN pip3 install jinja2 \
 	ipython
