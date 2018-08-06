@@ -7,10 +7,11 @@
 # 4. Run Make: Check
 # 5. Go back to the Edge.py script
 
-import os
-import zipfile
-import shutil
 import logging
+import os
+import shutil
+import sys
+import zipfile
 from azure.storage.blob import BlockBlobService, ContentSettings, PublicAccess
 
 SCRIPT_DIR = os.path.split(os.path.realpath(__file__))[0]
