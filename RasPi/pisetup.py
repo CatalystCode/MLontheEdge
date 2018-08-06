@@ -37,8 +37,18 @@ def main():
     compressed_model_name = "zipped{0}".format(model_dir)
     compressed_model_dir_path ="{0}/{1}.zip".format(SCRIPT_DIR, compressed_model_name)
    
+    # Get Login Credentials
+    azure_key_name = os.environ.get('AZURE_BLOBCONTAINER_NAME')
+    azure_key = os.environ.get('AZURE_BLOBCONTAINER_KEY')
+    
+    if azure_key_name or azure_key is None:
+        logging.debug('Error Loading Azure Blob Storage Keys. Exiting...')
+        sys.exit(1)
+    else:
+        logging.debug('Azure Storage Login Successful')
+        
     # Set up Azure Credentials
-    block_blob_service = BlockBlobService(account_name='**************', account_key='*******************************')
+    block_blob_service = BlockBlobService(account_name = azure_key_name, account_key = azure_key)
     if block_blob_service is None:
         logging.debug("No Azure Storage Account Connected")
         sys.exit(1)

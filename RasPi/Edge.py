@@ -310,7 +310,24 @@ def main():
         sys.exit(1)
 
     # Intialize Azure Properties
-    block_blob_service = BlockBlobService(account_name='***********', account_key='********************************')
+    azure_key_name = os.environ.get('AZURE_BLOBCONTAINER_NAME')
+    azure_key = os.environ.get('AZURE_BLOBCONTAINER_KEY')
+
+    print("Container Name:{0}".format(azure_key_name))
+    print("Container Key:{0}".format(azure_key))
+
+    if azure_key_name is None:
+        print('Name Error Failed. Exiting....')
+        sys.exit(1)
+
+    if azure_key is None:
+        print('Key Error Failed. Exiting....')
+        sys.exit(1)
+
+    if azure_key and azure_key_name is not None:
+        print('Everything worked fine')
+
+    block_blob_service = BlockBlobService(account_name = azure_key_name, account_key = azure_key)
    
     if block_blob_service is None:
         logging.debug("No Azure Storage Account Connected")
