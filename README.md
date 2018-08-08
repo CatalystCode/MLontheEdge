@@ -97,6 +97,61 @@ sudo raspi-config
 5. **Network Connection:**
 For this project, the majority of the network connectivity came through the attachment of an ethernet cable. However, attached are steps to connecting the Raspberry Pi to a wireless connection. [Wifi Connections](https://www.raspberrypi.org/documentation/configuration/wireless/wireless-cli.md)
 
+## Azure Storage
+**Azure Blob Storage:** 
+
+The Raspberry Pi has a small storage capability. Therefore, it is important to save picture, videos, models, and project description on the Cloud. For this project, Azure Storage is being used. Steps on how to set up Azure Storage is linked here. [Azure Storage](https://docs.microsoft.com/en-us/azure/storage/common/storage-create-storage-account)
+
+***Note:*** Be sure to save and make note of your **STORAGE ACCOUNT NAME** and **STORAGE ACCOUNT KEYS** They will be needed in the Edge.py and pisetup.py script later on your Raspberry Pi as well as on the Host.py script for your Host Device.
+![azureblobs](https://user-images.githubusercontent.com/24871485/42781252-76f83098-88fa-11e8-8f5c-5f5eff0a5c04.PNG)
+
+
+**Pi3 Folder:**
+
+1. The utilization of Azure Storage is required for this application. Azure allows for automatic uploads and downloads of content file. As well, it is essential for persitant updates to the current pi3 folder. 
+2. The first time the application is ran with a correct Azure Credentials, blob containers are created for use with that given account. In addition, the current version of the ***pi3*** folder located on the Raspberry Pi is uploaded to its respective blob container. 
+3. Constant checks are being made for changes and updates that occur every 3 hours. 
+
+**Important Note on the Pi3 Folder on Azure:**
+
+After the project has been ran once and the given storage containers have been made, the user can now make changes to the given model and the pi3 folder. 
+1. Using the Azure Portal or Microsoft Azure Storage Explorer, locate the **edgemodels** blob container.
+2. This is where the compiled "pi3 folder" with its given model is stored. It is important that the pi3 folder is zipped before being ready to be uploaded to the given blob container.
+3. There can only be one item in this blob container and it most be titled ***zippedpi3*** for use on the Raspberry Pi.
+![edgmodels](https://user-images.githubusercontent.com/24871485/42782127-dcbcfb96-88fc-11e8-8a09-6576447ef46a.PNG)
+
+
+## Download Models
+As of right now, the Microsoft ELL supports Neural Network Models that were trained with Microsoft Cognitive Toolkit(CNTK) or with Darknet. Follow the given tutorial for insights in how to download model with the ELL Library. [Importing Models.](https://microsoft.github.io/ELL/tutorials/Importing-models/)
+
+## From Host Device ELL to Raspberry Pi
+The next step is to now get a compressed model from the ELL Library from your laptop to your Raspberry Pi to be utilized. The directions below are modified based on a tutorial sample from the site [Microsft-Ell-Image-Classification.](https://microsoft.github.io/ELL/tutorials/Getting-started-with-image-classification-on-the-Raspberry-Pi/)
+
+1. Activate your Python enviroment on your host device
+```
+[Linux/macOS] source activate py36
+[Windows] activate py36
+```
+2. Create a new directory to be copied over to the Rasberry Pi. The directory should contain should compressed CTNK or Darknets model in ***model.ell*** form. It should also contain the text file for the model classification
+3. As before, run the wrap tool on your laptop or desktop computer, but this time specify the target platform as pi3. This tells the ELL compiler to generate machine code for the Raspberry Pi’s ARM Cortex A53 processor. This step needs to be performed in the directory to be copied to the Raspberry Pi.
+```bash
+python <ELL-root>/tools/wrap/wrap.py model.ell --language python --target pi3
+```
+4. To speed up the transfer of files to the Raspberry Pi, delete the model.ell file first before copying the folder. Now, there’s a pi3 directory that contains a CMake project that builds the Python wrapper and some helpful Python utilities. This directory should be inside a directory that also contains the model classification text.
+
+**Build Python Module:**
+1. THIS IS WHERE WE TALK ABOUT USING HOST.PY TO MOVE PI3 UP TO AZURE BLOB STORAGE.
+2. Log in to your Raspberry Pi, find the directory you just copied from your computer, and build the python module that wraps the ELL model.
+```bash
+cd pi3
+mkdir build
+cd build
+cmake .. -DCMAKE_BUILD_TYPE=Release
+make
+cd ../..
+```
+3. You just created a Python module named model, which includes functions that report the model’s input and output dimensions and makes it possible to pass images to the model for classification.
+
 ## **Programming Tools:**
 
 **CMake:**
@@ -213,59 +268,6 @@ python3 -c "import cv2; print(cv2.__version__)"
 rm ~/opencv.zip
 rm -rf ~/opencv-3.3.0
 ```
-## Download Models
-As of right now, the Microsoft ELL supports Neural Network Models that were trained with Microsoft Cognitive Toolkit(CNTK) or with Darknet. Follow the given tutorial for insights in how to download model with the ELL Library. [Importing Models.](https://microsoft.github.io/ELL/tutorials/Importing-models/)
-
-## From Host Device ELL to Raspberry Pi
-The next step is to now get a compressed model from the ELL Library from your laptop to your Raspberry Pi to be utilized. The directions below are modified based on a tutorial sample from the site [Microsft-Ell-Image-Classification.](https://microsoft.github.io/ELL/tutorials/Getting-started-with-image-classification-on-the-Raspberry-Pi/)
-
-1. Activate your Python enviroment on your host device
-```
-[Linux/macOS] source activate py36
-[Windows] activate py36
-```
-2. Create a new directory to be copied over to the Rasberry Pi. The directory should contain should compressed CTNK or Darknets model in ***model.ell*** form. It should also contain the text file for the model classification
-3. As before, run the wrap tool on your laptop or desktop computer, but this time specify the target platform as pi3. This tells the ELL compiler to generate machine code for the Raspberry Pi’s ARM Cortex A53 processor. This step needs to be performed in the directory to be copied to the Raspberry Pi.
-```bash
-python <ELL-root>/tools/wrap/wrap.py model.ell --language python --target pi3
-```
-4. To speed up the transfer of files to the Raspberry Pi, delete the model.ell file first before copying the folder. Now, there’s a pi3 directory that contains a CMake project that builds the Python wrapper and some helpful Python utilities. This directory should be inside a directory that also contains the model classification text.
-
-**Build Python Module:**
-1. For this step, you’ll be working with your the Raspberry Pi device. If your Pi device is accessible over the network, copy the directory using the Unix scp tool or the Windows WinSCP tool.
-2. Log in to your Raspberry Pi, find the directory you just copied from your computer, and build the python module that wraps the ELL model.
-```bash
-cd pi3
-mkdir build
-cd build
-cmake .. -DCMAKE_BUILD_TYPE=Release
-make
-cd ../..
-```
-3. You just created a Python module named model, which includes functions that report the model’s input and output dimensions and makes it possible to pass images to the model for classification.
-
-## Azure Storage
-**Azure Blob Storage:** 
-
-The Raspberry Pi has a small storage capability. Therefore, it is important to save picture, videos, models, and project description on the Cloud. For this project, Azure Storage is being used. Steps on how to set up Azure Storage is linked here. [Azure Storage](https://docs.microsoft.com/en-us/azure/storage/common/storage-create-storage-account)
-
-***Note:*** Be sure to save and make note of your **STORAGE ACCOUNT NAME** and **STORAGE ACCOUNT KEYS** They will be needed in the Edge.py script later on your Raspberry Pi.
-![azureblobs](https://user-images.githubusercontent.com/24871485/42781252-76f83098-88fa-11e8-8f5c-5f5eff0a5c04.PNG)
-
-**Pi3 Folder:**
-
-1. The utilization of Azure Storage is required for this application. Azure allows for automatic uploads and downloads of content file. As well, it is essential for persitant updates to the current pi3 folder. 
-2. The first time the application is ran with a correct Azure Credentials, blob containers are created for use with that given account. In addition, the current version of the ***pi3*** folder located on the Raspberry Pi is uploaded to its respective blob container. 
-3. Constant checks are being made for changes and updates that occur every 3 hours. 
-
-**Important Note on the Pi3 Folder on Azure:**
-
-After the project has been ran once and the given storage containers have been made, the user can now make changes to the given model and the pi3 folder. 
-1. Using the Azure Portal or Microsoft Azure Storage Explorer, locate the **edgemodels** blob container.
-2. This is where the compiled "pi3 folder" with its given model is stored. It is important that the pi3 folder is zipped before being ready to be uploaded to the given blob container.
-3. There can only be one item in this blob container and it most be titled ***zippedpi3*** for use on the Raspberry Pi.
-![edgmodels](https://user-images.githubusercontent.com/24871485/42782127-dcbcfb96-88fc-11e8-8a09-6576447ef46a.PNG)
-
 
 ## Running Applications
 The steps below show how the given Azure ML on Edge Project is deployed
