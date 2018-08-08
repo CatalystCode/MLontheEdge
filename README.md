@@ -199,7 +199,9 @@ AZURE_CONTAINER_KEY=yourblobstorageaccesskey
 docker run --device=/dev/vcsm --device=/dev/vchiq --env-file env.list amlonedge/dockeronedge:latest 
 ```
 4. Once this command is ran, the project must check and update various files as neccesary. After about 30 seconds of setting up, the project is run continously. Afterwards, predictions, images and video are set to the given Azure Blob Storage Account.  
-## **Programming Tools:**
+
+## **DO IT YOURSELF**
+***Necessary Python Packages***
 
 **CMake:**
 CMake will be used on the Raspberry Pi to create python modules that can be called from given code. In order to install CMake on your Raspberry Pi, you must first be connected to the network, then open a terminal window and type:
@@ -326,9 +328,20 @@ git clone https://github.com/CatalystCode/MLontheEdge.git
 ```bash
 cd MLontheEdge/Raspi/
 ```
-3. Run the Edge.py script adapted specially for the Raspberry Pi
+3. Export your Azure Name and Key as Enviromental Variable
+```bash
+$EDITOR ~/.profile
+#ADD the following line to the bottom of the file:
+export AZURE_CONTAINER_NAME=yourblobstoragename
+export AZURE_CONTAINER_KEY=yourblobstoragekey
+```
+4. Run pisetup.py in order to set up the entire project. This script checks for the model version as well as make it ready for use.
+```bash
+python3 pisetup.py
+```
+5. Run the Edge.py script adapted specially for the Raspberry Pi
 ```python
 python3 Edge.py
 ```
-4. While the script is running, a camera preview window will be opened allow you to see what the picamera sees. The scripts takes a picture every 5 seconds and returns what the model thinks it sees in that picture.
-5. If the model and python script recognize an object, a video is captured of the 10 seconds before that moment and 15 seconds after the given moment and then saved it to an **Azure Blob Storage** account.
+6. While the script is running, a camera preview window will be opened allow you to see what the picamera sees. The scripts takes a picture every 5 seconds and returns what the model thinks it sees in that picture.
+7. If the model and python script recognize an object, a video is captured of the 10 seconds before that moment and 15 seconds after the given moment and then saved it to an **Azure Blob Storage** account.
