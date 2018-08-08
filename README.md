@@ -152,6 +152,53 @@ cd ../..
 ```
 3. You just created a Python module named model, which includes functions that report the model’s input and output dimensions and makes it possible to pass images to the model for classification.
 
+## Quick Project Run with Docker
+
+**Setting Up Docker on Raspberry Pi**
+1. Begin by updating the Raspberry Pi packages with the folloing command
+```bash
+sudo apt-get update && sudo apt-get upgrade
+```
+2. Proceed to installing Docker for the Raspberry Pi
+```bash
+curl -sSL https://get.docker.com | sh
+```
+3. Add 'Pi' user to the Docker group 
+```bash
+sudo usermod -aG docker pi
+```
+**Note:** Until a Raspberry Pi reboot, the *sudo* prefix will be required before running any Docker commands
+
+4. Verify that the Docker download was succesful in two ways
+```docker
+docker --version
+```
+```docker
+sudo docker run armhf/hello-world
+```
+
+**MLontheEdge for Docker**
+A prebuilt docker image of this entire project has been made available on DockerHub. Step on how to download and run succesfully are listed below.
+1. In the terminal, run the following docker command to pull the MLonthe Edge Docker Image
+```bash
+docker pull amlonedge\dockonedge:latest
+```
+**Note:** This is a very large image and will take approximately 15 minutes to be completely ready for use.
+
+2. Once this is done, in your preferred working directory, create a **env.list** file. A copy of what is required is available on this repository. 
+3. The downloaded docker images requires a user Azure Blob Storage Name and Key to be entired as enviromental variables in order to run. This should be the Azure Storage accounnt where your **zippedpi3** folder is located and where you would like project imgaes and video saved too.
+
+```bash
+vim env.list
+
+AZURE_CONTAINER_NAME=yourblobstorageaccountname
+AZURE_CONTAINER_KEY=yourblobstorageaccesskey
+```
+3. After saving the env.list file, the final step is to actually run the entire project. Run the project with the following exact command:
+```bash
+docker run --device=/dev/vcsm --device=/dev/vchiq --env-file env.list amlonedge/dockeronedge:latest 
+```
+4. Once this command is ran, the project must check and update various files as neccesary. After about 30 seconds of setting up, the project is run continously. Afterwards, predictions, images and video are set to the given Azure Blob Storage Account.  
 ## **Programming Tools:**
 
 **CMake:**
