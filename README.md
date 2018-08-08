@@ -200,7 +200,7 @@ docker run --device=/dev/vcsm --device=/dev/vchiq --env-file env.list amlonedge/
 ```
 4. Once this command is ran, the project must check and update various files as neccesary. After about 30 seconds of setting up, the project is run continously. Afterwards, predictions, images and video are set to the given Azure Blob Storage Account.  
 
-## **DO IT YOURSELF**
+## **Do It Yourself**
 ***Necessary Python Packages***
 
 **CMake:**
