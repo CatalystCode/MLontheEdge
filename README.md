@@ -6,10 +6,11 @@ The overall purpose of this document is to showcase an example of Azure Machine 
 2. [Windows Device Set Up](https://github.com/CatalystCode/MLontheEdge#window-device-set-up)
 * [ELL for Windows Devices](https://github.com/Microsoft/ELL/blob/master/INSTALL-Windows.md) 
 3. [Set Up for Raspberry Pi Devices](https://github.com/CatalystCode/MLontheEdge#set-up-for-raspberry-pi-devices)
-4. [Programming Tools](https://github.com/CatalystCode/MLontheEdge#programming-tools)
+4. [Azure Storage](https://github.com/CatalystCode/MLontheEdge#azure-storage)
 5. [Download PreTrained Model](https://github.com/CatalystCode/MLontheEdge#download-models)
 6. [Host Device to Raspberry Pi](https://github.com/CatalystCode/MLontheEdge#from-host-device-ell-to-raspberry-pi)
-7. [Azure Blob Storage on Pi3](https://github.com/CatalystCode/MLontheEdge/#azure-storage)
+7. [MLonEdge with Docker](https://github.com/CatalystCode/MLontheEdge#quick-project-run-with-docker)
+7. [MlonEdge by Hand](https://github.com/CatalystCode/MLontheEdge#do-it-yourself)
 6. [Running Application](https://github.com/CatalystCode/MLontheEdge#running-applications)
 
 ## Acquiring Equipments
