@@ -328,7 +328,7 @@ git clone https://github.com/CatalystCode/MLontheEdge.git
 ```bash
 cd MLontheEdge/Raspi/
 ```
-3. Export your Azure Name and Key as Enviromental Variable
+3. Export the Azure Blob Storage Name and Storage Key as enviromental Variable
 ```bash
 $EDITOR ~/.profile
 #ADD the following line to the bottom of the file:
