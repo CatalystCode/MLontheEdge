@@ -140,7 +140,12 @@ python <ELL-root>/tools/wrap/wrap.py model.ell --language python --target pi3
 4. To speed up the transfer of files to the Raspberry Pi, delete the model.ell file first before copying the folder. Now, there’s a pi3 directory that contains a CMake project that builds the Python wrapper and some helpful Python utilities. This directory should be inside a directory that also contains the model classification text.
 
 **Build Python Module:**
-1. THIS IS WHERE WE TALK ABOUT USING HOST.PY TO MOVE PI3 UP TO AZURE BLOB STORAGE.
+
+The final step in the process is getting the pi3 folder transfered to Azure Blob Storage and the Raspberry Pi
+1. A helper script for tranfering to Azure Blob Storage has been created; *Host.py*. Simply change the Azure Account Storage Name and Key in the Host.py script and run it in the same directory as the **pi3 folder.** This will compress the neccessary folder and make it availbale to be used by the Raspberry Pi.
+```
+python Host.py
+```
 2. Log in to your Raspberry Pi, find the directory you just copied from your computer, and build the python module that wraps the ELL model.
 ```bash
 cd pi3
