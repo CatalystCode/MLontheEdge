@@ -28,6 +28,9 @@ def run_shell(cmd):
     """
     output = subprocess.check_output(cmd.split(' '))
     logging.debug('Running shell command')
+    if output is None:
+        logging.debug('Error Running Shell Command. Exiting...')
+        sys.exit(1)
     return str(output.rstrip().decode())
 
 def save_video(capture_rate, input_path, output_path, rename_path):
@@ -64,9 +67,9 @@ def model_predict(image):
         predict_value = top_2[0][1]
         return word, predict_value
 
-def json_fill(video_time, word_prediction, predicition_value, video_name, json_path):
+def write_json_to_file(video_time, word_prediction, predicition_value, video_name, json_path):
     # Template for description of the image and video taken
-    json_messge = {
+    json_message = {
         'Description': {
             'sysTime':               str(datetime.now().isoformat()) + 'Z',
             'videoStartTime':        str(video_time.isoformat()) + 'Z',
@@ -78,29 +81,24 @@ def json_fill(video_time, word_prediction, predicition_value, video_name, json_p
     logging.debug("Rewriting Json to File")
     # Write Json Message to file
     with open(json_path, 'w') as json_file:
-        json.dump(json_messge, json_file)
-
-def azure_download_from_path(model_container_name, model_dir_path, compressed_model_dir_path, compressed_model_name):
-    # Download Azure Version to the Raspberry pi
-    block_blob_service.get_blob_to_path(model_container_name, compressed_model_name, compressed_model_dir_path)
-    # Create a directory to save the new model into
-    os.makedirs(model_dir_path)
-    # File comes in a compressed format
-    zf = zipfile.ZipFile(compressed_model_dir_path)
-    # Extract the compressed model into a file that can be used.
-    zf.extractall(model_dir_path)
+        json.dump(json_message, json_file)
 
 def azure_model_update(update_json_path): 
     # List the Models in the blob. There should only be one named zippedpi3
     model_blob_list = block_blob_service.list_blobs(model_container_name)
+    found_blob = False
     for blob in model_blob_list:
         # Find the given one if there are more than one models
         if (blob.name == 'zippedpi3'):
             # Get the Date of the most recent update
             last_blob_update = str(blob.properties.last_modified)
             # Leave the loop once we found what we want
-            break;
-    
+            found_blob=True
+            break
+    # Check to make sure that there is a catch for if there is no zippedpi3 folder on Azure
+    if found_blob == False:
+        logging.debug("No Pi3 was found on Azure. Re-run pi3setup.py and make sure your Azure Blob Storage Account is up to date")
+
     # If we don't already got the json just go ahead and create a new one
     if not os.path.exists(update_json_path) or os.stat(update_json_path).st_size == 0:
         # Since we did not have the json of infomation about it, go ahead and update to be safe
@@ -204,7 +202,7 @@ def get_video():
                 # Once it is uploaded, delete the image
                 os.remove(image_path)
                 break
-            # If we don;t break by finidng the right predicition stay in the loop
+            # If we don't break by finidng the right predicition stay in the loop
             seconds_past = 0
             # Delete the image from the OS folder to save space
             os.remove(image_path)
@@ -271,7 +269,7 @@ def get_video():
         azure_upload_from_path(full_video_folder, full_path, full_video_path, 'video/mp4')
 
         # Create json and fill it with information
-        json_fill(video_start_time, word, predict_value, full_path, json_file_path)
+        write_json_to_file(video_start_time, word, predict_value, full_path, json_file_path)
 
         # Upload Json to Azure Blob Storge
         azure_upload_from_path(json_container_name, json_file_name, json_file_path, 'application/json')
@@ -312,9 +310,6 @@ def main():
     # Intialize Azure Properties
     azure_key_name = os.environ.get('AZURE_BLOBCONTAINER_NAME')
     azure_key = os.environ.get('AZURE_BLOBCONTAINER_KEY')
-
-    print("Container Name:{0}".format(azure_key_name))
-    print("Container Key:{0}".format(azure_key))
 
     if azure_key_name is None:
         print('Name Error Failed. Exiting....')
