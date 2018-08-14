@@ -1,2 +1,4 @@
 /pi3/build/*
 env.list
+../.vs/
+../.vscode/
