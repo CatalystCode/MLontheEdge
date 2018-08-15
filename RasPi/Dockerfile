@@ -11,8 +11,6 @@ RUN apt-get update && apt-get install -y --no-install-recommends\
 		libxvidcore-dev libx264-dev \
     	libopenblas-dev \
     	liblapacke-dev \
-    	# needed by highgui tool
-    	#libgtk2.0-dev libgtk-3-dev \
     	# for opencv math operations
     	libatlas-base-dev gfortran \
     	# Python Dev
@@ -25,18 +23,23 @@ RUN apt-get update && apt-get install -y --no-install-recommends\
     	curl \
     	wget \
     	# Open CV Requirement
-    	python3-numpy 
+    	python3-numpy \
+		# Download PiCamera
+		python3-picamera \
+		# Downlod gpac for MP4 formating
+		gpac
 
 # Update and Upgrade
 RUN apt-get update && apt-get upgrade -y
 
 # Install final neccesarry opencv packages
-RUN apt-get install -y libgtk2.0-dev libgtk-3-dev \
-	python3-picamera \
-	gpac
-		
+RUN apt-get install -y libgtk2.0-dev libgtk-3-dev 
+
 RUN pip3 install jinja2 \
-	ipython
+	ipython \
+	azure-iothub-device-client \
+	azure-iothub-service-client \
+	azure-storage 
 
 # Begin building opencv in a Docker Container
 WORKDIR /home/pi
@@ -80,13 +83,8 @@ RUN make install
 # Need to export path to the bashrc
 RUN echo 'export PYTHONPATH=$PYTHONPATH:/usr/local/lib/python3.5/site-packages' >> ~/.bashrc
 
-# Run the pip install of the Azure IoTHub Clients
-WORKDIR /home/pi
-RUN pip3 install azure-iothub-device-client 
-RUN pip3 install azure-iothub-service-client 
-RUN pip3 install azure-storage
-
 # Delete the downloaded opencv helpers
+WORKDIR /home/pi
 RUN rm -rf opencvbuilder
 RUN rm -rf opencv.zip
 RUN rm -rf opencv-3.3.0
@@ -101,22 +99,11 @@ RUN apt-get update && apt-get upgrade -y
 # Get the AMLonEdge Project in the Docker Container
 RUN mkdir amlonedge
 WORKDIR /home/pi/amlonedge
-COPY ./test.py /home/pi/amlonedge/test.py
 COPY ./run.sh /home/pi/amlonedge/run.sh
-COPY ./categories.txt /home/pi/amlonedge/categories.txt
 COPY ./Edge.py /home/pi/amlonedge/Edge.py
 COPY ./ellmanager.py /home/pi/amlonedge/ellmanager.py
-COPY ./Host.py /home/pi/amlonedge/Host.py
 COPY ./pisetup.py /home/pi/amlonedge/pisetup.py
 COPY ./updatehistory.json /home/pi/amlonedge/updatehistory.json
-
-# Add pi3 - Make pi3 directory
-RUN mkdir pi3
-WORKDIR /home/pi/amlonedge/pi3
-COPY ./pi3/ /home/pi/amlonedge/pi3/
-
-# Go back into the running directory
-WORKDIR /home/pi/amlonedge
 
 # Run the given shell script when prompted
 RUN chmod +x Edge.py
