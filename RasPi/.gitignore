@@ -4,3 +4,5 @@ env.list
 ../.vs/
 ../.vscode/
 categories.txt
+ForEdge.py
+oldEdge.py
