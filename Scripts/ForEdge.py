@@ -17,10 +17,23 @@ import termios
 import time
 import tty
 import zipfile
+import iothub_service_client
 from datetime import datetime, timedelta
 from azure.storage.blob import BlockBlobService, ContentSettings, PublicAccess
+from iothub_client import IoTHubClient, IoTHubClientError, IoTHubTransportProvider, IoTHubClientResult, IoTHubError, DeviceMethodReturnValue
+from iothub_service_client import IoTHubRegistryManager, IoTHubRegistryManagerAuthMethod
+from iothub_service_client import IoTHubDeviceTwin, IoTHubError
 
+# Initial Variable Declaration
 SCRIPT_DIR = os.path.split(os.path.realpath(__file__))[0]
+CONNECTION_STRING = "HostName=mlonedge2018.azure-devices.net;DeviceId=MyPythonDevice;SharedAccessKey=i1unDd3yJ9/4qq3Jn8FMsEyvQTezh03mo/QD3Ag/GI4="
+PROTOCOL = IoTHubTransportProvider.MQTT
+CLIENT = IoTHubClient(CONNECTION_STRING, PROTOCOL)
+SEND_REPORTED_STATE_CONTEXT = 0
+METHOD_CONTEXT = 0
+SEND_REPORTED_STATE_CALLBACKS = 0
+METHOD_CALLBACKS = 0
+THRESHOLDER=0.4
 
 class PiImageDetection():
     
@@ -146,6 +159,41 @@ class PiImageDetection():
             json_data["lastupdate"] = last_blob_update
             with open (update_json_path, "w+") as j:
                 json.dump(json_data, j)
+
+    def iothub_client_init(self):
+        if CLIENT.protocol == IoTHubTransportProvider.MQTT or client.protocol == IoTHubTransportProvider.MQTT_WS:
+            CLIENT.set_device_method_callback(self.device_method_callback, METHOD_CONTEXT)
+
+    def send_reported_state_callback(self, status_code, user_context):
+        global SEND_REPORTED_STATE_CALLBACKS
+        print ( "Device twins updated." )
+
+    def device_method_callback(self, method_name, payload, user_context):
+        global METHOD_CALLBACKS
+
+        if method_name == "DeviceConfig":
+            logging.debug( "Waiting for Configuration..." )
+            if payload is not None:
+                print ("Payload Received: {0}".format(payload))
+                # Parse the Payload right here
+                configuration = json.loads(payload)
+                for key, value in dict.items(configuration):
+                    if key == "threshold":
+                        THRESHOLDER=0.1
+                        
+                    
+            current_time = str(datetime.now().isoformat())
+            reported_state = "{\"rebootTime\":\"" + current_time + "\"}"
+            CLIENT.send_reported_state(reported_state, len(reported_state), self.send_reported_state_callback, SEND_REPORTED_STATE_CONTEXT)
+        else:
+            print("Another Method was called")
+
+        # Azure IoT Hub Response
+        device_method_return_value = DeviceMethodReturnValue()
+        device_method_return_value.response = "{ \"Response\": \"Successful Config\" }"
+        device_method_return_value.status = 200
+
+        return device_method_return_value
 
     # Function to Upload a specified path to an object to Azure Blob Storage
     def azure_upload_from_path(self,blob_container,blob_name,blob_object,blob_format):
@@ -299,6 +347,9 @@ class PiImageDetection():
             shutil.rmtree(video_dir_path)
             camera_device.stop_recording()
 
+    def test(self):
+        print("yeah")
+
     def main(self):
         # Define Globals
         global camera_device
@@ -327,17 +378,26 @@ class PiImageDetection():
         # Intialize the updates Json File
         update_json_path = "{0}/{1}.json".format(SCRIPT_DIR, 'updatehistory')
             
-        # Constantly run the Edge.py Script
-        while True:
-            logging.debug('Starting Edge.py')
-
-            # Check and Run Model Updates
-            self.azure_model_update(update_json_path)
+        try:
+            self.iothub_client_init()
+            # Constantly run the Edge.py Script
+            iothub_device_twin = IoTHubDeviceTwin(CONNECTION_STRING)
+            fake_capt = iothub_device_twin.properties.desired.deviceconfig.captureRate
+            print("We about to get that property")
+            print(fake_capt)
+            while True:
+                logging.debug('Starting Edge.py')
+                # Check and Run Model Updates
+                self.azure_model_update(update_json_path)
                 
-            # Began running and stay running the entire project.
-            self.get_video()
+                # Began running and stay running the entire project.
+                self.get_video()
+        except IoTHubError as iothub_error:
+            print ( "Unexpected error %s from IoTHub" % iothub_error )
+            return
     
 
 if __name__ == '__main__':
     mydetector = PiImageDetection()
+    mydetector.test()
     mydetector.main()
