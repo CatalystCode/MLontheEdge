@@ -19,7 +19,7 @@ The overall purpose of this document is to showcase an example of Azure Machine 
     <th>Item</th>
     <th>Description</th>
     <th style = "text-align:right">Est. Cost (USD)</th>
-    <th>Purchase Link</th>
+    <th>Example Products</th>
   </tr>
     <tr>
     <td>Raspberry Pi 3</td>
