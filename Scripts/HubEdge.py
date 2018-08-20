@@ -23,7 +23,7 @@ from azure.storage.blob import BlockBlobService, ContentSettings, PublicAccess
 from iothub_client import IoTHubClient, IoTHubClientError, IoTHubTransportProvider, IoTHubClientResult, IoTHubError, DeviceMethodReturnValue
 
 # Initial Variable Declaration
-CONNECTION_STRING = ""
+CONNECTION_STRING = os.environ.get('CONNECTION_STRING')
 PROTOCOL = IoTHubTransportProvider.MQTT
 CLIENT = IoTHubClient(CONNECTION_STRING, PROTOCOL)
 SEND_REPORTED_STATE_CONTEXT = 0
@@ -136,6 +136,16 @@ def azure_model_update(update_json_path):
         json_data["lastupdate"] = last_blob_update
         with open (update_json_path, "w+") as j:
             json.dump(json_data, j)
+
+        # Intialize Azure IoTHub Config Properties
+        self.capture_rate = 30.0
+        self.prediction_threshold = 0.4
+        self.camera_res_len = 256
+        self.camera_res_wid = 256
+        self.video_capture_length = 30
+        self.video_preroll = 5
+        self.capture_video = False
+
 
 def iothub_client_init():
     if CLIENT.protocol == IoTHubTransportProvider.MQTT or client.protocol == IoTHubTransportProvider.MQTT_WS:
@@ -403,7 +413,6 @@ def main():
             
             # Began running and stay running the entire project.
             get_video()
-
     except IoTHubError as iothub_error:
         print ( "Unexpected error %s from IoTHub" % iothub_error )
         return
