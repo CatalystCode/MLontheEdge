@@ -19,10 +19,12 @@ import tty
 import zipfile
 from datetime import datetime, timedelta
 from azure.storage.blob import BlockBlobService, ContentSettings, PublicAccess
+from iothub_client import IoTHubClient, IoTHubClientError, IoTHubTransportProvider, IoTHubClientResult, IoTHubError, DeviceMethodReturnValue
+from iothub_service_client import IoTHubRegistryManager, IoTHubRegistryManagerAuthMethod
+from iothub_service_client import IoTHubDeviceTwin, IoTHubError
 SCRIPT_DIR = os.path.split(os.path.realpath(__file__))[0]
 
-#Intialize IoTHub Variable Declararion
-CONNECTION_STRING = os.environ.get('CONNECTION_STRING')
+CONNECTION_STRING = ""
 PROTOCOL = IoTHubTransportProvider.MQTT
 CLIENT = IoTHubClient(CONNECTION_STRING, PROTOCOL)
 SEND_REPORTED_STATE_CONTEXT = 0
@@ -165,15 +167,15 @@ class PiImageDetection():
             with open (update_json_path, "w+") as j:
                 json.dump(json_data, j)
 
-    def iothub_client_init():
+    def iothub_client_init(self):
         if CLIENT.protocol == IoTHubTransportProvider.MQTT or client.protocol == IoTHubTransportProvider.MQTT_WS:
-            CLIENT.set_device_method_callback(device_method_callback, METHOD_CONTEXT)
+            CLIENT.set_device_method_callback(self.device_method_callback, METHOD_CONTEXT)
 
-    def send_reported_state_callback(status_code, user_context):
+    def send_reported_state_callback(self, status_code, user_context):
         global SEND_REPORTED_STATE_CALLBACKS
         print ( "Device twins updated." )
 
-    def device_method_callback(method_name, payload, user_context):
+    def device_method_callback(self, method_name, payload, user_context):
         global METHOD_CALLBACKS
 
         if method_name == "DeviceConfig":
@@ -184,9 +186,9 @@ class PiImageDetection():
                 configuration = json.loads(payload)
                 for key, value in dict.items(configuration):
                     print("Key and Value from Azure: {0} and {1}".format(key, value))
-                    if isdigit(value):
+                    if isinstance(value, str):
                         if key == "predictionThreshold":
-                            self.prediction_threshold = value
+                            self.prediction_threshold = float(value)
                         elif key == "captureRate":
                             self.capture_rate = value
                         elif key == "cameraResolutionLength":
@@ -206,7 +208,7 @@ class PiImageDetection():
                     
             current_time = str(datetime.now().isoformat())
             reported_state = "{\"rebootTime\":\"" + current_time + "\"}"
-            CLIENT.send_reported_state(reported_state, len(reported_state), send_reported_state_callback, SEND_REPORTED_STATE_CONTEXT)
+            CLIENT.send_reported_state(reported_state, len(reported_state), self.send_reported_state_callback, SEND_REPORTED_STATE_CONTEXT)
         else:
             print("Another Method was called")
 
@@ -256,6 +258,7 @@ class PiImageDetection():
                     camera_device.capture(image_path)
                     camera_device.wait_recording(1)
 
+                    print("Prediction Threshold: {}".format(self.prediction_threshold))
                     # Make Prediction with the first picture
                     logging.debug('Prediction Captured')
                     word, predict_value = self.model_predict(image)
@@ -400,7 +403,7 @@ class PiImageDetection():
         
         # Intialize IoTHub
         try:
-            iothub_client_init()
+            self.iothub_client_init()
             # Constantly run the Edge.py Script
             while True:
                 logging.debug('Starting Edge.py')
