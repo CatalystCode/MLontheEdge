@@ -26,7 +26,7 @@ from iothub_service_client import IoTHubDeviceTwin, IoTHubError
 
 # Initial Variable Declaration
 SCRIPT_DIR = os.path.split(os.path.realpath(__file__))[0]
-CONNECTION_STRING = "HostName=mlonedge2018.azure-devices.net;DeviceId=MyPythonDevice;SharedAccessKey=i1unDd3yJ9/4qq3Jn8FMsEyvQTezh03mo/QD3Ag/GI4="
+CONNECTION_STRING = os.environ.get('CONNECTION_STRING')
 PROTOCOL = IoTHubTransportProvider.MQTT
 CLIENT = IoTHubClient(CONNECTION_STRING, PROTOCOL)
 SEND_REPORTED_STATE_CONTEXT = 0
