@@ -25,37 +25,37 @@ The overall purpose of this document is to showcase an example of Azure Machine 
     <td>Raspberry Pi 3</td>
     <td>Main device for running software</td>
     <td style="text-align:right">$37.00</td>
-    <td><a target="_blank" href="https://ebay.to/2KlncsD">Purchase</a></td>
+    <td><a target="_blank" href="https://ebay.to/2KlncsD">PiDevice</a></td>
   </tr>
   <tr>
     <td>Sandisk Ultra 32GB Micro SDHC</td>
     <td>Will store the Raspbian Operating System image and software for the Raspberry Pi 3</td>
     <td style="text-align:right">$12.00</td>
-    <td><a target="_blank" href="http://a.co/eCokiTM">Purchase</a></td>
+    <td><a target="_blank" href="http://a.co/eCokiTM">MicroSD</a></td>
   </tr>
   <tr>
     <td>Raspberry Pi Camera</td>
     <td>Used to capture images and video on the Pi</td>
     <td style="text-align:right">$6.00</td>
-    <td><a target="_blank" href="https://ebay.to/2Kv1ezf">Purchase</a></td>
+    <td><a target="_blank" href="https://ebay.to/2Kv1ezf">PiCamera</a></td>
   </tr>
   <tr>
     <td>USB Keyboard</td>
     <td>WIRED CONNECTION: Keyboard control for the Pi</td>
     <td style="text-align:right">$15.00</td>
-    <td><a target="_blank" href="https://ebay.to/2IGqv7U">Purchase</a></td>
+    <td><a target="_blank" href="https://ebay.to/2IGqv7U">Keyboard</a></td>
   </tr>
   <tr>
     <td>USB Mouse</td>
     <td>WIRED CONNECTION: Mouse control for the Pi</td>
     <td style="text-align:right">$6.00</td>
-    <td><a target="_blank" href="https://ebay.to/2Kmdsy4">Purchase</a></td>
+    <td><a target="_blank" href="https://ebay.to/2Kmdsy4">Mouse</a></td>
   </tr>
   <tr>
     <td>Ethernet Cable</td>
     <td>WIRED CONNECTION: Network connection for the Pi</td>
     <td style="text-align:right">$4.00</td>
-    <td><a target="_blank" href="https://ebay.to/2Naib3V">Purchase</a></td>
+    <td><a target="_blank" href="https://ebay.to/2Naib3V">Ethernet</a></td>
   </tr>
 </table>
 
